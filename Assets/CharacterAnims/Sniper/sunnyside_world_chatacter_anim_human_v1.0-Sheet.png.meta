@@ -1,0 +1,2881 @@
+fileFormatVersion: 2
+guid: 695f65f8a529f4d7b98b5f4eb88c2f7a
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 12
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 556
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d642033419b2c4f1eb185ec6853f1478
+      internalID: -672611818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_1
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 556
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6aaa09f5d194c457fb102b9b6eed13ad
+      internalID: -661608914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 556
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c389675f34b5840198bf6a9ab1f3b6d2
+      internalID: -33316455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_3
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 556
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c04dd649bd5124e36b6dcc3aa06a4f45
+      internalID: 1596855619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 524
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e479c41b4393c49f49e0b020bdefbd58
+      internalID: -1828891091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 524
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc1c24510259a41efb5dcdcdd8933e58
+      internalID: -1188780966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 524
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0cc32b0107a2640d4b9d9de86a2c520f
+      internalID: -999302702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 492
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a04074645f60425a827d17f786b3c8c
+      internalID: 2136788869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 492
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3fa6ea54a7dd1409397321ae8634c375
+      internalID: -1764056710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_9
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 492
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08425de0ff40b426e955cfeaea69e376
+      internalID: -1573868889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_10
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 492
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f4044417df1f4fabb445ed1a3152144
+      internalID: 2125023467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_11
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 460
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8e0f351d2476a47dc91faafeac41b857
+      internalID: -486665012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_12
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 460
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfdb9be9d0ec7425abd3d07788ce0ddd
+      internalID: 1174318446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_13
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 460
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0bae23cd376141efb5f39f4eb508d76
+      internalID: 1371040321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_14
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 460
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd3b111016c354ffeb5402c65fcc5ebc
+      internalID: -1055423279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_15
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 428
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d19d8446d43b348c68b86ff62a38ae34
+      internalID: 435744408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_16
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 428
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ee1ebb60523c420b801ce050ec1d62b
+      internalID: -593289694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_17
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 428
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f833b03cfe0d42758957dacf45170cc
+      internalID: 1203945942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_18
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 428
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 503bac365aefc4a8d8d772cfefe54334
+      internalID: -2097846853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_19
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 428
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 358e9d3ecd10b4552956a8994b745544
+      internalID: 1605153645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_20
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 428
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b791c037b0cca48fd9f9e86647ca7a17
+      internalID: 1607037841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_21
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 428
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 404fa3285d7b14ed6827cf549d2b8f4d
+      internalID: 983683638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_22
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 428
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2159b8df0d0e435e8c812b8d76a9d9d
+      internalID: -1088684291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_23
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 396
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 828b35fa358de4ff1bbe64c7ac7a74e9
+      internalID: -2138246628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_24
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 396
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b6120a0647e74f7f9d9a7fad633f1d0
+      internalID: 1157455827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_25
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 396
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5e5846e06ae54c2f9956da49a0cf00d
+      internalID: 1399265237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_26
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 396
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a1e456f658ec46e2a45771faf5ff124
+      internalID: 219128059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_27
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 396
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 575cbf0add8d842b2b2ebdec51b9d054
+      internalID: 1338340515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_28
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 396
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 097e537292097459688912f2424d25be
+      internalID: -629980317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_29
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 396
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8d65a14ac1f34318a83680748ee13a1
+      internalID: -219741180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_30
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 396
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ee0802150db14dfc96816f56d73b413
+      internalID: 1361285967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_31
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 364
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ca32fcacca8b45279baac01e2c8dade
+      internalID: 627609974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_32
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 364
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0827302cdf784140a923cb265a37cba
+      internalID: -478152639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_33
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 364
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d81a2c0b3452448aeb121793815eee05
+      internalID: -1215747404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_34
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 364
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce9b0a2e87e3447329cdb2c4dd821eda
+      internalID: -1877895629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_35
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 364
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ce8ffb4278654e32be427466f9d969c
+      internalID: 133752675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_36
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 364
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca93a05188efc471a9329bfc47ac4525
+      internalID: -275522478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_37
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 364
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d1658bf55b4a4b9cb90ec18a0091dda
+      internalID: -1846253258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_38
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 364
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13d7095e64272479587c20c7e293ffb2
+      internalID: 1063070748
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_39
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 332
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97c71739067a14e5387b663d96ac98ad
+      internalID: -2068874381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_40
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 332
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4721bf79b18af46febbd9728c325fff7
+      internalID: 1426696917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_41
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 332
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e56ab35684f754d469a092db9c8ea2fc
+      internalID: -421937431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_42
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 332
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfb987ceff66f4fd38de7c6686c86acb
+      internalID: -1424491807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_43
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 332
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8eba599e76667415dbd7be8ba2a6e1c1
+      internalID: 1102567532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_44
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 332
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff396cc9a4b20480d93892f8475da3a4
+      internalID: 1152140268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_45
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 332
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7c65af655a964f31a8669af4c1a1c5b
+      internalID: -1720549482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_46
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 332
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0b6de63e98b349cfa7c717df750495b
+      internalID: 899753653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_47
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 300
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9016dc787dbcf4069b4b4098e2c5f683
+      internalID: -860186231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_48
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 300
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a82c1efdff01e432297ae0cce92c034d
+      internalID: 673169233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_49
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 300
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1a9ba9a5ba5840588420ca145ec8905
+      internalID: 2006209530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_50
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 301
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cfde3c09d4bfe4a8481e42eb2be50123
+      internalID: 851960775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_51
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 300
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e68a280ef7c9483fbf9ecf4b2a7d26b
+      internalID: 153475278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_52
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 300
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6fabcee5ebee4d9a93eb77101464266
+      internalID: -1677534525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_53
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 301
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8d5673bf796474aef974e9799313c199
+      internalID: -171458379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_54
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 268
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aaee442d085954f0699446889bf0d910
+      internalID: -805889403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_55
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 268
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 974bdbb172de049e79f3b2c3fbc8d900
+      internalID: 1533353110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_56
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 268
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 965667a5463af4cd8a00f8280fcda45f
+      internalID: 1616890017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_57
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 269
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cadf70ca54cf94f15a9670b874b5f786
+      internalID: 1303398855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_58
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 268
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff65016ea31294380bc76110b0974a48
+      internalID: 1813157450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_59
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 268
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2b9b864993854824ba795496dc0bf8b
+      internalID: 264742919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_60
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 268
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3592384b8f4134ec18893d19c24f85a4
+      internalID: -1276157386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_61
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 269
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9622673ca2b2f45ef92f7944c7189e7b
+      internalID: -508985216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_62
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 236
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc54fd485761c4eb5a48b62253a99be3
+      internalID: -917031355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_63
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 236
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e7116b05c27a49488610d3df53908e7
+      internalID: 74987743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_64
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 236
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3da2d941c31ab4987af86454d0c4a952
+      internalID: 488705669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_65
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 237
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 905d768ded3284825b22c9e4df928f6b
+      internalID: -1378114385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_66
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 236
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1325c0ab8a304df8a7098e690417797
+      internalID: -1737106471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_67
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 236
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05fdbcd38056a4f51a287f4a8127dae9
+      internalID: -1958208419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_68
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 236
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6ef5a1093f964ac7ae0304523cfa0cf
+      internalID: 305585244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_69
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 237
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5086d14122eae4b7a92f1b9bdcd6801b
+      internalID: 656952244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_70
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 204
+        width: 11
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dac223ee19be949a5870ac75ae63ea9f
+      internalID: -205218509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_71
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 204
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc8e069d70dee4fccaf33d8c16cb54c6
+      internalID: -941199143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_72
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 204
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0596a5cd040448f6985450d69b03601
+      internalID: 605556953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_73
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 205
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8cf948f036d6d466bafd2c584388e812
+      internalID: 2033550496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_74
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 204
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8f2851f67647e403da485f0226d4052b
+      internalID: -1999080412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_75
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 204
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69a54bbd1532e4e82b4da9fe42fe0094
+      internalID: 1599247193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_76
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 204
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 219b59f12c2e24c50925e4e29b041796
+      internalID: -1343714047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_77
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 205
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 416285945fad545888a5aa9ca6f977e1
+      internalID: 741956443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_78
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 172
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1b2a863869a84e5c9dd0ecac935417c
+      internalID: -140602249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_79
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 172
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 898869c0f99ba4d0da6d6b9f942a11e8
+      internalID: -1903144553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_80
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 172
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d37eddbcf251e41df8097e05da17bc3b
+      internalID: 798618064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_81
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 172
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80727cf2a67f5499e9bb0fec28070cb6
+      internalID: -1165474762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_82
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 172
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73f4fefd0d73b48709f851759f1bce7f
+      internalID: -1731453702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_83
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 172
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a706881640efd49faacef0e4016da717
+      internalID: 517671700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_84
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 172
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49d7fba5c0bcf4da3b5a40ed90a9a13d
+      internalID: -54812394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_85
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 172
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b196d5aa3c949423f9328c3542661e2b
+      internalID: -631918605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_86
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 140
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3824f8b3eaeb64afba7e9357a274a0b4
+      internalID: 713317228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_87
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 140
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a0802478b55d4ec6ba4a81672b074b1
+      internalID: -995956442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_88
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 140
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b337ae400404f49b6b65af1c26179d89
+      internalID: -1856171613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_89
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 140
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 41e4fe1ff7bfa44afb83915d1d4469db
+      internalID: -1646413615
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_90
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 140
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3e9f2af5f7954e028218bbbc31848e1
+      internalID: 670008538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_91
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 140
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb978b128910d478ba459efd5e2b657b
+      internalID: 1445821265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_92
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 140
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a01685ea72f5e4595b1709538cf957ad
+      internalID: 1826968204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_93
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 108
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 913d5461515a347a2a254fabaacec8c6
+      internalID: 1684789536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_94
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 108
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a418cc3f6684048f2bbe79093adccf8d
+      internalID: -1129753843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_95
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 108
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be18bdf7c5059458a9284f38c117d052
+      internalID: 123369909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_96
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 108
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff70e6a3ab55e474c8f7088bbdc17517
+      internalID: -1660991042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_97
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 108
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a5e34b859e544718a20495e023c4116
+      internalID: -282140443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_98
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 108
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9284d363a4c5446295245989ce193e2
+      internalID: 577834132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_99
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 108
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 892a92969536f48f08b30d5553fddb78
+      internalID: 964041020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_100
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 76
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8ab8d5f272c8c431fb10ac7b2515888c
+      internalID: 215993726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_101
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 84
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76244c79c9df7492e99efd2454722f07
+      internalID: 645697380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_102
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 85
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5260fe8b8bdbb4cfe8d1b1c92b35a2a6
+      internalID: 1494628285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_103
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 84
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f1748e1f6c6b4a7793bcaf92d8e67d2
+      internalID: 736528911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_104
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 76
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af83b6b35e01c41e89c1cf0c7cda3b7e
+      internalID: -1600599408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_105
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 79
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87055358d1fd64b2cb60162fd44f21de
+      internalID: -585550956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_106
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 76
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 419e24ede7806424b8f6bbec6f0c973f
+      internalID: 1493011475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_107
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 76
+        width: 14
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bad78c69abc96403abc85a67693c424f
+      internalID: 2074711481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_108
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 44
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73e5cfb8ca3eb4baabc026134b3050e6
+      internalID: 1596789177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_109
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 44
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f382aa41b9475477c9302a921e044c48
+      internalID: 684312933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_110
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 44
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6897c5a654f2f4b4ca3370170d7c7bfd
+      internalID: -2117898089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_111
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 46
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 16af99c700ccf458eaca78a4488f8209
+      internalID: -238401665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_112
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 44
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 11d0f6396a6ca48cbb0d973fe91e5275
+      internalID: -921040086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_113
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 44
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3798d0cdde90844279f247fa3aab5e04
+      internalID: -1003433342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_114
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 44
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cfbbb3226bc74f42964a1e8cc208b99
+      internalID: 1257549274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_115
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 46
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f595064fab9ba4b1694872bd76b82fdd
+      internalID: -184118528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_116
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 12
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8aff6cb504a94d5891a2a432884ee91
+      internalID: -418321819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_117
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 12
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb465a5cc7e904f52884e350a001fc26
+      internalID: 1962766592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_118
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 12
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99b701b83c3df41b0981f0495b9408d7
+      internalID: -338367885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_119
+      rect:
+        serializedVersion: 2
+        x: 97
+        y: 12
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d28abf4ece51d4d55a55910bbb4199ea
+      internalID: 1754355535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_120
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 12
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 612a1df009b194eec85e4188a9561d0d
+      internalID: -723423256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_121
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 12
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a68c3637eb5c04f6388b46a9317cac8a
+      internalID: -1327587728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_122
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 12
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ddb389b7832c42dea3c65a34c730468
+      internalID: -1772137760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sunnyside_world_chatacter_anim_human_v1.0-Sheet_123
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 12
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 387f1692e9f624277a09222629065c3f
+      internalID: 1953316296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_0: -672611818
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_1: -661608914
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_10: 2125023467
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_100: 215993726
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_101: 645697380
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_102: 1494628285
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_103: 736528911
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_104: -1600599408
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_105: -585550956
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_106: 1493011475
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_107: 2074711481
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_108: 1596789177
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_109: 684312933
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_11: -486665012
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_110: -2117898089
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_111: -238401665
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_112: -921040086
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_113: -1003433342
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_114: 1257549274
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_115: -184118528
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_116: -418321819
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_117: 1962766592
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_118: -338367885
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_119: 1754355535
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_12: 1174318446
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_120: -723423256
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_121: -1327587728
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_122: -1772137760
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_123: 1953316296
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_13: 1371040321
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_14: -1055423279
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_15: 435744408
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_16: -593289694
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_17: 1203945942
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_18: -2097846853
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_19: 1605153645
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_2: -33316455
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_20: 1607037841
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_21: 983683638
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_22: -1088684291
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_23: -2138246628
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_24: 1157455827
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_25: 1399265237
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_26: 219128059
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_27: 1338340515
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_28: -629980317
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_29: -219741180
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_3: 1596855619
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_30: 1361285967
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_31: 627609974
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_32: -478152639
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_33: -1215747404
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_34: -1877895629
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_35: 133752675
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_36: -275522478
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_37: -1846253258
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_38: 1063070748
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_39: -2068874381
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_4: -1828891091
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_40: 1426696917
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_41: -421937431
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_42: -1424491807
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_43: 1102567532
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_44: 1152140268
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_45: -1720549482
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_46: 899753653
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_47: -860186231
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_48: 673169233
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_49: 2006209530
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_5: -1188780966
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_50: 851960775
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_51: 153475278
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_52: -1677534525
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_53: -171458379
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_54: -805889403
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_55: 1533353110
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_56: 1616890017
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_57: 1303398855
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_58: 1813157450
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_59: 264742919
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_6: -999302702
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_60: -1276157386
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_61: -508985216
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_62: -917031355
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_63: 74987743
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_64: 488705669
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_65: -1378114385
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_66: -1737106471
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_67: -1958208419
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_68: 305585244
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_69: 656952244
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_7: 2136788869
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_70: -205218509
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_71: -941199143
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_72: 605556953
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_73: 2033550496
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_74: -1999080412
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_75: 1599247193
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_76: -1343714047
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_77: 741956443
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_78: -140602249
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_79: -1903144553
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_8: -1764056710
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_80: 798618064
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_81: -1165474762
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_82: -1731453702
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_83: 517671700
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_84: -54812394
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_85: -631918605
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_86: 713317228
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_87: -995956442
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_88: -1856171613
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_89: -1646413615
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_9: -1573868889
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_90: 670008538
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_91: 1445821265
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_92: 1826968204
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_93: 1684789536
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_94: -1129753843
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_95: 123369909
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_96: -1660991042
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_97: -282140443
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_98: 577834132
+      sunnyside_world_chatacter_anim_human_v1.0-Sheet_99: 964041020
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
