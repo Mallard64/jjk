@@ -36,6 +36,8 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
     {
         _started = true;
         _status  = "Connecting…";
+        NetworkMatchUI.Instance?.HideAll();  // clear any result screen left from a previous match
+        ScreenBlackout.Instance.SetAlpha(0f);  // …and the white fade the previous match ended on
 
         _runner = gameObject.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;

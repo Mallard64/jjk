@@ -145,7 +145,15 @@ public class PlayerAnimationController : MonoBehaviour
         return BuildState(action, _facingSuffix);
     }
 
-    public void PlayDomainActivationPlaceholder() { }
+    /// <summary>Play the domain activation pose (direction-less single clip "domain", like roll). Locked
+    /// like an attack so movement doesn't override it during the startup freeze; RefreshMovementState
+    /// (called when the domain opens) clears it.</summary>
+    public void PlayDomain()
+    {
+        _attackLocked = true;
+        SetAnimatorSpeed(1f);
+        TryPlay(BuildState("domain", ""));
+    }
 
     /// <summary>Set the hitstun (seconds) the NEXT PlayHurt should use. Consumed once; falls back to
     /// hurtLockDuration when unset. The hit's Hitbox supplies this just before damage is applied.</summary>

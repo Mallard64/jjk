@@ -19,6 +19,7 @@ public class FusionPlayerMovement : NetworkBehaviour
     private AimableAttackController   _aimable;
     private PlayerRoll                _roll;
     private PlayerOverdrive           _overdrive;
+    private BaseDomainExpansion       _domain;
 
     private bool _rollPressed;
 
@@ -31,6 +32,7 @@ public class FusionPlayerMovement : NetworkBehaviour
         _aimable   = GetComponent<AimableAttackController>();
         _roll      = GetComponent<PlayerRoll>();
         _overdrive = GetComponent<PlayerOverdrive>();
+        _domain    = GetComponent<BaseDomainExpansion>();
     }
 
     public override void Spawned()
@@ -65,8 +67,8 @@ public class FusionPlayerMovement : NetworkBehaviour
         if (!HasStateAuthority) return;
         if (_health != null && _health.IsDead) return;
 
-        // Frozen during the death → respawn round reset (blackout window).
-        if (FusionPlayerSync.RoundResetting)
+        // Frozen during the death → respawn round reset (blackout window), or while a domain forms (startup).
+        if (FusionPlayerSync.RoundResetting || BaseDomainExpansion.PlayersFrozen)
         {
             if (_rb != null && _rb.simulated) _rb.velocity = Vector2.zero;
             NetworkedMoveDir = Vector2.zero;
@@ -89,6 +91,7 @@ public class FusionPlayerMovement : NetworkBehaviour
         if (!inHitstun && !isRolling && _rb != null)
         {
             float speed = moveSpeed * (_overdrive != null ? _overdrive.MoveSpeedMultiplier : 1f);
+            if (_domain != null) speed *= _domain.MoveSpeedMultiplier;  // domain bonus (owner only)
             if (autoAttacking) speed *= _auto.AttackMoveSpeedMultiplier;
             _rb.velocity = move * speed;
         }

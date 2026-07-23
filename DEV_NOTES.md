@@ -18,6 +18,13 @@ Components on root Canvas child: `MatchUI`
 No separate scene HUD object — each player prefab carries `WorldHealthBar` + `WorldEnergyBar`,
 which choose corner UI vs. world head bar by viewer (see "Player Prefab Setup" below).
 
+### 3b. Network Match UI (online / Arena scene only)
+Empty GameObject with `NetworkMatchUI`. Drives the best-of-5 presentation; wire your own art:
+- `roundEndScreen` — GameObject shown at the end of every round ("ROUND END!"). Give it its own Animator/sprites; it plays when SetActive'd.
+- `victoryScreen` / `defeatScreen` — shown to the match winner / loser before the arena disconnects.
+- Leave the fields empty and the flow still runs (just the OnGUI score + white fade, no art). The running round score is drawn by this component (OnGUI), no wiring needed.
+Round count / hold times are tuned on the player prefab's `FusionPlayerSync` (`roundsToWin`, `deathLinger`, `roundEndHold`, `matchEndHold`).
+
 ### 4. Arena Walls
 Use Box Collider 2D on four wall GameObjects (or a tilemap with composite collider).
 Layer: Default (or create a "Wall" layer).

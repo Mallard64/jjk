@@ -59,6 +59,9 @@ public class AimableAttackController : MonoBehaviour
     [SerializeField] private float overdriveAttackKnockbackMultiplier  = 2.5f;
     [Tooltip("Scales the hitbox size when the attack fires in overdrive (1.5–2 = noticeably bigger).")]
     [SerializeField] private float overdriveAttackHitboxSizeMultiplier = 1.75f;
+    [Tooltip("Playback rate for the overdrive aimable attack (separate from the normal aimableAttackPlaybackSpeed). Snapshotted at release time.")]
+    [Range(0.1f, 4f)]
+    [SerializeField] private float overdriveAttackPlaybackSpeed = 1f;
 
     [Header("Hitbox")]
     [SerializeField] private AttackHitboxController aimableAttackHitbox;
@@ -79,12 +82,13 @@ public class AimableAttackController : MonoBehaviour
     private float _currentDamageMultiplier    = 1f;
     private float _currentKnockbackMultiplier = 1f;
     private float _currentSizeMultiplier      = 1f;
+    private float _currentPlaybackSpeed       = 1f;
 
     public bool  IsAiming           => _aiming;
     public bool  IsAttacking        => _routine != null;
     public float CooldownRemaining  => Mathf.Max(0f, _cooldownTimer);
     public float EnergyCost         => aimableAttackEnergyCost;
-    public float PlaybackSpeed      => aimableAttackPlaybackSpeed;
+    public float PlaybackSpeed      => (_overdrive != null && _overdrive.IsActive) ? overdriveAttackPlaybackSpeed : aimableAttackPlaybackSpeed;
     public bool  TakeDirection      => takeDirection;
     public bool  Throwable          => throwable;
     public float ThrowRadius        => throwRadius;
@@ -150,6 +154,7 @@ public class AimableAttackController : MonoBehaviour
         _currentDamageMultiplier    = overdrive ? overdriveAttackDamageMultiplier     : 1f;
         _currentKnockbackMultiplier = overdrive ? overdriveAttackKnockbackMultiplier  : 1f;
         _currentSizeMultiplier      = overdrive ? overdriveAttackHitboxSizeMultiplier : 1f;
+        _currentPlaybackSpeed       = overdrive ? overdriveAttackPlaybackSpeed        : aimableAttackPlaybackSpeed;
 
         _energy?.Drain(aimableAttackEnergyCost);  // guarded above — there's enough
 
@@ -195,7 +200,7 @@ public class AimableAttackController : MonoBehaviour
     {
         _movement?.SetCanMove(false);
         if (takeDirection) _anim?.SetFacing(aimDir);
-        _anim?.PlayAimableAttack(aimDir, aimableAttackAnim, takeDirection, aimableAttackPlaybackSpeed);
+        _anim?.PlayAimableAttack(aimDir, aimableAttackAnim, takeDirection, _currentPlaybackSpeed);
 
         // Clip is now current — spread the four phases across its full length; per-phase scales reshape
         // the split, then playback speed scales the whole thing. Cooldown/regen are set before the first
@@ -204,7 +209,7 @@ public class AimableAttackController : MonoBehaviour
         float fJump    = aimableAttackJumpFrames    * jumpFrameScale;
         float fImpact  = aimableAttackImpactFrames  * impactFrameScale;
         float fEndlag  = aimableAttackEndlagFrames  * endlagFrameScale;
-        float perFrame = SecondsPerFrame(fStartup + fJump + fImpact + fEndlag) / Mathf.Max(0.1f, aimableAttackPlaybackSpeed);
+        float perFrame = SecondsPerFrame(fStartup + fJump + fImpact + fEndlag) / Mathf.Max(0.1f, _currentPlaybackSpeed);
         float startup = fStartup * perFrame;
         float jump    = fJump    * perFrame;
         float impact  = fImpact  * perFrame;

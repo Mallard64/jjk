@@ -10,6 +10,8 @@ using UnityEngine;
 public class FusionPlayerCombat : NetworkBehaviour
 {
     [Networked] public NetworkBool NetworkedOverdrive { get; set; }
+    [Networked] public NetworkBool NetworkedDomainActive { get; set; }
+    [Networked] public NetworkBool NetworkedDomainStartup { get; set; }
 
     private Rigidbody2D               _rb;
     private PlayerHealth              _health;
@@ -74,6 +76,12 @@ public class FusionPlayerCombat : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (!HasStateAuthority) return;
+
+        // Replicate our domain's open/closed + forming state every tick so the opponent's peer can apply
+        // its cross-player effects (overdrive lock / regen freeze), the startup freeze, and the VFX/arena.
+        NetworkedDomainActive  = _domain != null && _domain.IsActive;
+        NetworkedDomainStartup = _domain != null && _domain.IsStartingUp;
+
         if (_health != null && _health.IsDead)
         {
             _overdrivePressed = false;
@@ -91,14 +99,31 @@ public class FusionPlayerCombat : NetworkBehaviour
             return;
         }
 
-        // Overdrive is a toggle: each Shift press flips the replicated state. Processed before the
-        // hitstun gate so you can toggle while staggered; proxies render the tint off NetworkedOverdrive.
-        if (_overdrivePressed)
+        // Frozen while a domain forms (its 0.5s startup): drop buffered input.
+        if (BaseDomainExpansion.PlayersFrozen)
         {
-            NetworkedOverdrive = !NetworkedOverdrive;
-            _overdrivePressed  = false;
+            _attackPressed = _aimableDown = _aimableUp = _domainPressed = _overdrivePressed = false;
+            return;
         }
-        _overdrive?.SetActive(NetworkedOverdrive);
+
+        // Overdrive is a toggle: each Shift press flips the replicated state. While our domain is up the
+        // domain controls overdrive (free) — ignore presses and just mirror the real state.
+        if (_domain != null && _domain.IsActive)
+        {
+            _overdrivePressed = false;
+        }
+        else
+        {
+            if (_overdrivePressed)
+            {
+                NetworkedOverdrive = !NetworkedOverdrive;
+                _overdrivePressed  = false;
+            }
+            _overdrive?.SetActive(NetworkedOverdrive);
+        }
+        // Re-sync to the real state (SetActive can refuse when domain-locked; domain-free forces it on),
+        // so the networked flag — and the proxy tint — always tracks what's really happening.
+        if (_overdrive != null) NetworkedOverdrive = _overdrive.IsActive;
 
         // Match offline behavior (PlayerCombatController early-returns on hitstun): drop buffered
         // presses so a key tapped during the hurt animation doesn't fire the moment hitstun ends.
@@ -138,7 +163,12 @@ public class FusionPlayerCombat : NetworkBehaviour
         // Proxies mirror the authority's overdrive state so the red tint matches what the
         // local player sees. Authority's call here re-asserts the same state (no-op via
         // PlayerOverdrive.SetActive's idempotent guard).
-        if (!HasStateAuthority) _overdrive?.SetActive(NetworkedOverdrive);
+        if (!HasStateAuthority)
+        {
+            _overdrive?.SetActive(NetworkedOverdrive);
+            _domain?.SetNetworkActive(NetworkedDomainActive);    // mirror opponent's domain (registry/VFX/arena)
+            _domain?.SetNetworkStartup(NetworkedDomainStartup);  // …and its forming state (freeze on this peer)
+        }
     }
 
     private void OnLocalAutoAttackStarted(string action, Vector2 facing)

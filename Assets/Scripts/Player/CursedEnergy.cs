@@ -17,6 +17,10 @@ public class CursedEnergy : MonoBehaviour
     public float MaxEnergy => maxEnergy;
     public float CurrentEnergy { get; private set; }
 
+    /// <summary>While true, passive regen is suppressed (set each frame by the domain system: any active
+    /// domain or this player's domain burnout freezes their CE so they fight on a fixed budget).</summary>
+    public bool RegenBlocked { get; set; }
+
     public event Action<float, float> OnEnergyChanged; // (current, max)
 
     private float _regenSuppressTimer;
@@ -33,6 +37,7 @@ public class CursedEnergy : MonoBehaviour
             _regenSuppressTimer -= Time.deltaTime;
             return;
         }
+        if (RegenBlocked) return;  // domain / burnout freezes the meter
         if (CurrentEnergy < maxEnergy)
         {
             Restore(regenPerSecond * Time.deltaTime);

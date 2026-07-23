@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Player1
   - Player2
+  - OriginalArena
   layers:
   - Default
   - TransparentFX
@@ -45,4 +46,7 @@ TagManager:
     locked: 0
   - name: 1
     uniqueID: 2676914611
+    locked: 0
+  - name: New Layer 2
+    uniqueID: 3160168849
     locked: 0

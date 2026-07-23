@@ -19,8 +19,6 @@ using UnityEngine.UI;
 /// </summary>
 public class WorldHealthBar : MonoBehaviour
 {
-    private const float ChangeEpsilon = 0.001f;
-
     [Header("Corner UI (local player, online)")]
     [SerializeField] private GameObject cornerRoot;
     [SerializeField] private Image      cornerFill;
@@ -32,9 +30,11 @@ public class WorldHealthBar : MonoBehaviour
     [SerializeField] private bool      hideWhenFull = false;
 
     [Header("Change Flash")]
-    [Tooltip("The fill flashes toward this colour whenever HP changes, fading back to its normal colour.")]
+    [Tooltip("The fill flashes toward this colour on a discrete HP change, fading back to its normal colour.")]
     [SerializeField] private Color flashColor    = Color.white;
     [SerializeField] private float flashDuration = 0.18f;
+    [Tooltip("Minimum HP change to flash — keeps continuous drips (overdrive/domain) from flashing every frame; only real hits/spends do.")]
+    [SerializeField] private float flashMinChange = 3f;
 
     private PlayerHealth     _health;
     private FusionPlayerSync _net;
@@ -130,8 +130,8 @@ public class WorldHealthBar : MonoBehaviour
     {
         if (_fill == null) return;
 
-        // Flash on any change (gain or loss), but not the initial bind.
-        if (!float.IsNaN(_lastValue) && Mathf.Abs(current - _lastValue) > ChangeEpsilon)
+        // Flash on a discrete change (hit / spend), not continuous drain, and not the initial bind.
+        if (!float.IsNaN(_lastValue) && Mathf.Abs(current - _lastValue) >= flashMinChange)
             _flashTimer = flashDuration;
         _lastValue = current;
 

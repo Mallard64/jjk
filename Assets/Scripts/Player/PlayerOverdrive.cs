@@ -53,18 +53,44 @@ public class PlayerOverdrive : MonoBehaviour
 
     /// <summary>Set overdrive on/off. Forced off while dead. Proxies call this every frame with the
     /// replicated state; the local player flips it via Toggle().</summary>
+    private bool _domainLocked;
+
+    /// <summary>Locked out of overdrive by the domain system (an enemy domain is active, or this player is
+    /// in domain burnout). Forces overdrive off and refuses re-entry while locked.</summary>
+    public void SetDomainLocked(bool locked)
+    {
+        _domainLocked = locked;
+        if (locked && IsActive) SetActive(false);
+    }
+
+    private bool _domainFree;
+
+    /// <summary>While true, the owner's active domain grants overdrive for FREE: it's forced on and
+    /// neither CE nor HP drains. Releasing it (domain ends) drops overdrive.</summary>
+    public void SetDomainFree(bool free)
+    {
+        if (_domainFree == free) return;
+        _domainFree = free;
+        SetActive(free);  // domain grants overdrive on open, drops it on close
+        // Domain overdrive shows the red tint but NOT the white screen glow (the domain's own collapse
+        // flicker is busy enough); force the glow off in case overdrive was already on manually.
+        if (free && (_net == null || _net.IsLocalPlayer))
+            ScreenEffects.Instance?.SetOverdriveGlow(false);
+    }
+
     public void SetActive(bool value)
     {
         if (_health != null && _health.IsDead) value = false;
+        if (_domainLocked && value) return;  // can't enter overdrive while domain-locked
         if (IsActive == value) return;
         IsActive = value;
         ApplyTint();
         _anim?.SetOverdriveMode(value);
 
         // Glow the screen only for the local player (offline, or the online authority) — never for an
-        // opponent proxy, whose overdrive is mirrored here for the red sprite tint.
+        // opponent proxy, and never for domain-granted (free) overdrive.
         if (_net == null || _net.IsLocalPlayer)
-            ScreenEffects.Instance?.SetOverdriveGlow(value);
+            ScreenEffects.Instance?.SetOverdriveGlow(value && !_domainFree);
     }
 
     /// <summary>Flip overdrive on/off — the toggle entry point for the local player's Shift press.</summary>
@@ -72,6 +98,12 @@ public class PlayerOverdrive : MonoBehaviour
 
     void Update()
     {
+        if (_domainFree)
+        {
+            // Domain-powered: keep it on (manual toggle can't drop it) and drain nothing — it's free.
+            if (!IsActive && !(_health != null && _health.IsDead)) SetActive(true);
+            return;
+        }
         if (!IsActive) return;
         // Drain runs on authority only. Proxies still get the tint via SetActive (called by
         // FusionPlayerCombat.Render based on the networked flag) but never debit resources.

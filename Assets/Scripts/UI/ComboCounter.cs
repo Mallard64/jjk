@@ -21,7 +21,7 @@ public class ComboCounter : MonoBehaviour
     private static ComboCounter _instance;
     public static ComboCounter Instance => _instance != null ? _instance : Build();
 
-    private class Combo { public int count; public float hold; public PlayerAnimationController victim; }
+    private class Combo { public int count; public float hold; public PlayerAnimationController victim; public int lastFrame = -1; }
 
     private readonly Dictionary<GameObject, Combo> _combos  = new Dictionary<GameObject, Combo>();
     private readonly List<GameObject>              _scratch = new List<GameObject>();
@@ -44,11 +44,21 @@ public class ComboCounter : MonoBehaviour
             combo = new Combo();
             _combos[attacker] = combo;
         }
+
+        // A victim has two overlapping colliders (body + hurtbox), so one swing can raise two hits in the
+        // same frame. Damage is deduped victim-side by i-frames, but this attacker-side tally isn't — so
+        // count only the first registration of a given victim per frame.
+        if (combo.lastFrame == Time.frameCount && combo.victim == victim) return;
+
         bool continued = victimWasStunned && combo.victim == victim;
-        combo.count  = continued ? combo.count + 1 : 1;
-        combo.victim = victim;
-        combo.hold   = DisplayHold;
+        combo.count     = continued ? combo.count + 1 : 1;
+        combo.victim    = victim;
+        combo.hold      = DisplayHold;
+        combo.lastFrame = Time.frameCount;
     }
+
+    /// <summary>Wipe all live combos (e.g. at an online round reset) without building the singleton.</summary>
+    public static void ClearAll() { if (_instance != null) _instance._combos.Clear(); }
 
     void Update()
     {

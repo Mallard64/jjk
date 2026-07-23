@@ -8,11 +8,14 @@ using UnityEngine;
 /// proxy-side HP/death mirroring; pairs with FusionPlayerMovement and FusionPlayerCombat
 /// on the same player prefab.
 ///
-/// Also drives the death → blackout → respawn round reset: each peer watches every player it
-/// knows about (its own authority player plus opponent proxies) and, when ANY of them dies, runs
-/// a local reset — freeze (via the static RoundResetting flag, read by FusionPlayerMovement /
-/// FusionPlayerCombat), black out this peer's screen, then respawn its own player at full HP/CE on
-/// its own spawn point. Both peers observe the same death, so both reset together.
+/// Also drives the best-of-5 round/match flow. Each peer watches every player it knows about (its own
+/// authority player plus opponent proxies) and, when ANY of them dies, runs a local reset — freeze (via
+/// the static RoundResetting flag, read by FusionPlayerMovement / FusionPlayerCombat), award the round to
+/// the survivor (each winner's authority tallies its own replicated RoundWins), replay the last few
+/// seconds, fade to white, and show the ROUND END screen. If neither fighter has reached roundsToWin it
+/// respawns and the next round starts; once someone hits roundsToWin it shows VICTORY / DEFEAT and shuts
+/// the runner down (both peers disconnect — the arena closes). Both peers observe the same death, so both
+/// run the flow together.
 /// </summary>
 public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
 {
@@ -22,17 +25,22 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
     public bool IsLocalPlayer => Object != null && Object.IsValid && HasStateAuthority;
     public bool IsAuthority   => Object != null && Object.IsValid && HasStateAuthority;
 
-    [Networked] public float       NetworkedHp     { get; set; }
-    [Networked] public float       NetworkedEnergy { get; set; }
-    [Networked] public NetworkBool NetworkedDead   { get; set; }
+    [Networked] public float       NetworkedHp        { get; set; }
+    [Networked] public float       NetworkedEnergy    { get; set; }
+    [Networked] public NetworkBool NetworkedDead      { get; set; }
+    [Networked] public int         NetworkedRoundWins { get; set; }
 
-    [Header("Death / Respawn")]
-    [Tooltip("Seconds the death animation is shown before the screen starts fading to black.")]
+    [Header("Round / Match flow")]
+    [Tooltip("Seconds the death animation is shown before the instant replay.")]
     [SerializeField] private float deathLinger = 1f;
-    [Tooltip("Seconds to fade the screen to / from black.")]
+    [Tooltip("Seconds to fade the screen to / from white.")]
     [SerializeField] private float fadeDuration = 0.35f;
-    [Tooltip("Seconds the screen stays fully black before players respawn.")]
-    [SerializeField] private float blackoutDuration = 3f;
+    [Tooltip("Seconds the ROUND END screen is held before the next round / result.")]
+    [SerializeField] private float roundEndHold = 2f;
+    [Tooltip("Seconds the VICTORY / DEFEAT screen is held before disconnecting.")]
+    [SerializeField] private float matchEndHold = 3.5f;
+    [Tooltip("Round wins needed to take the match (best-of-5 = first to 3).")]
+    [SerializeField] private int   roundsToWin = 3;
 
     private Rigidbody2D     _rb;
     private PlayerHealth    _health;
@@ -44,7 +52,24 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
     // True on a peer while it is mid round-reset; movement/combat freeze the local player off this.
     public static bool RoundResetting { get; private set; }
 
+    // This peer's own authority player. Drives the score HUD without polling.
+    private static FusionPlayerSync _local;
+    public static bool MatchActive        => _local != null;
+    public static int  LocalRoundWins     => _local != null ? _local.NetworkedRoundWins : 0;
+    public static int  OpponentRoundWins
+    {
+        get
+        {
+            foreach (var p in All) if (p != null && p != _local) return p.NetworkedRoundWins;
+            return 0;
+        }
+    }
+
     private Vector3 _spawnPosition;
+    // Edge-detect so one death triggers exactly one round reset. Re-arms only once every player is
+    // alive again — otherwise the winner (who respawns first) would re-fire off the opponent proxy
+    // that still reads dead, double-counting the round.
+    private bool _roundArmed = true;
 
     public bool IsDead => _health != null && _health.IsDead;
 
@@ -74,6 +99,7 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
 
         if (HasStateAuthority)
         {
+            _local = this;
             LocalPlayerTransform = transform;
             _spawnPosition = transform.position;  // GameLauncher placed us here — respawn returns to it
             if (_health != null) NetworkedHp     = _health.MaxHp;
@@ -97,6 +123,7 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
     {
         All.Remove(this);
         RoundResetting = false;  // never strand the peer frozen if a player leaves mid-reset
+        if (_local == this) _local = null;
 
         if (_health != null)
         {
@@ -113,8 +140,17 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
     void Update()
     {
         // The local authority player drives this peer's round reset when anyone dies.
-        if (!IsAuthority || RoundResetting) return;
-        if (AnyPlayerDead()) StartCoroutine(RoundResetRoutine());
+        if (!IsAuthority) return;
+
+        bool anyDead = AnyPlayerDead();
+        if (!anyDead) _roundArmed = true;  // everyone alive again → ready to catch the next death
+
+        if (RoundResetting) return;
+        if (_roundArmed && anyDead)
+        {
+            _roundArmed = false;
+            StartCoroutine(RoundResetRoutine());
+        }
     }
 
     private static bool AnyPlayerDead()
@@ -124,23 +160,51 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
         return false;
     }
 
+    private bool OpponentIsDead()
+    {
+        foreach (var p in All)
+            if (p != null && p != this && p.IsDead) return true;
+        return false;
+    }
+
     private IEnumerator RoundResetRoutine()
     {
         RoundResetting = true;
         _overdrive?.SetActive(false);
+        ComboCounter.ClearAll();  // don't carry the killing-blow combo into the replay / next round
 
-        // The fallen player's death animation is already playing (its PlayerCombatController.OnDeath
-        // locally, and the proxy mirror in Render). Hold briefly so it's visible before blacking out.
+        // Award the round to the survivor: each winner's authority tallies its own replicated score.
+        // The loser's routine (its own player is dead) skips this, so exactly one side scores per round.
+        if (IsAuthority && !IsDead && OpponentIsDead())
+            NetworkedRoundWins += 1;
+
+        // Hold on the death pose before fading out.
         yield return new WaitForSeconds(deathLinger);
-        yield return ScreenBlackout.Instance.FadeTo(1f, fadeDuration);
-        yield return new WaitForSeconds(blackoutDuration);
 
-        // Respawn this peer's player on its own spawn at full HP/CE (Respawn also resets anim/movement).
+        // Fade to white and show the ROUND END screen on both peers.
+        yield return ScreenBlackout.Instance.FadeTo(1f, fadeDuration, Color.white);
+        NetworkMatchUI.Instance?.ShowRoundEnd();
+        yield return new WaitForSeconds(roundEndHold);
+
+        // Match point? First to roundsToWin ends it (best-of-5 = first to 3).
+        if (NetworkedRoundWins >= roundsToWin || OpponentRoundWins >= roundsToWin)
+        {
+            if (NetworkedRoundWins >= roundsToWin) NetworkMatchUI.Instance?.ShowVictory();
+            else                                   NetworkMatchUI.Instance?.ShowDefeat();
+            yield return new WaitForSeconds(matchEndHold);
+
+            // Arena closes: this peer disconnects (both peers reach here independently). Stay frozen on
+            // the result screen — Despawned clears RoundResetting once the runner tears us down.
+            Runner?.Shutdown();
+            yield break;
+        }
+
+        // Next round: respawn this peer's player on its own spawn at full HP/CE, clear the screen.
         transform.position = _spawnPosition;
         if (_rb != null) _rb.position = _spawnPosition;
         _health?.Respawn();
-
-        yield return ScreenBlackout.Instance.FadeTo(0f, fadeDuration);
+        NetworkMatchUI.Instance?.HideRoundEnd();
+        yield return ScreenBlackout.Instance.FadeTo(0f, fadeDuration, Color.white);
         RoundResetting = false;
     }
 

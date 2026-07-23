@@ -40,6 +40,7 @@ public class AimingReticle : MonoBehaviour
     private static Sprite _sharedCircleSprite;
 
     private FusionPlayerSync        _net;
+    private PlayerHealth            _health;
     private PlayerInputHandler      _input;
     private AutoAttackController    _auto;
     private AimableAttackController _aimable;
@@ -49,6 +50,7 @@ public class AimingReticle : MonoBehaviour
     void Awake()
     {
         _net     = GetComponent<FusionPlayerSync>();
+        _health  = GetComponent<PlayerHealth>();
         _input   = GetComponent<PlayerInputHandler>();
         _auto    = GetComponent<AutoAttackController>();
         _aimable = GetComponent<AimableAttackController>();
@@ -63,6 +65,14 @@ public class AimingReticle : MonoBehaviour
     void LateUpdate()
     {
         if (_reticle == null) return;
+
+        // Hide while the player is dead or mid round-reset (covers the instant replay + round-end screen),
+        // so a fallen fighter's reticle doesn't linger over the replay.
+        if ((_health != null && _health.IsDead) || FusionPlayerSync.RoundResetting)
+        {
+            if (_reticle.gameObject.activeSelf) _reticle.gameObject.SetActive(false);
+            return;
+        }
 
         if (!IsLocalView())
         {

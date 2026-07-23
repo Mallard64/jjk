@@ -61,6 +61,9 @@ public class AutoAttackController : MonoBehaviour
     [SerializeField] private float  overdriveAttackKnockbackMultiplier = 2.5f;
     [Tooltip("Scales the hitbox size when the attack fires in overdrive (1.5–2 = noticeably bigger).")]
     [SerializeField] private float  overdriveAttackHitboxSizeMultiplier = 1.75f;
+    [Tooltip("Playback rate for the overdrive auto attack (separate from the normal autoAttackPlaybackSpeed). Snapshotted at fire time.")]
+    [Range(0.1f, 4f)]
+    [SerializeField] private float  overdriveAttackPlaybackSpeed = 1f;
     [Tooltip("Fallback animation when no per-character overdrive variant is authored. Runtime first tries 'overdrive-{autoAttackAnim}-{dir}' (e.g. 'overdrive-punch-se') and only uses this name when that state is missing.")]
     [SerializeField] private string overdriveAttackAnim = "heavy";
 
@@ -81,6 +84,7 @@ public class AutoAttackController : MonoBehaviour
     private float   _currentDamageMultiplier = 1f;
     private float   _currentKnockbackMultiplier = 1f;
     private float   _currentSizeMultiplier = 1f;
+    private float   _currentPlaybackSpeed = 1f;
 
     public bool  IsAttacking       => _routine != null;
     public float CooldownRemaining => Mathf.Max(0f, _cooldownTimer);
@@ -89,8 +93,9 @@ public class AutoAttackController : MonoBehaviour
     public float ThrowRadius       => throwRadius;
     /// <summary>Fraction of base move speed allowed while attacking; read by the movement scripts.</summary>
     public float AttackMoveSpeedMultiplier => attackMoveSpeedMultiplier;
-    /// <summary>Attack animation playback rate; read by FusionPlayerCombat so proxies match the speed.</summary>
-    public float PlaybackSpeed => autoAttackPlaybackSpeed;
+    /// <summary>Attack animation playback rate; read by FusionPlayerCombat so proxies match the speed. Overdrive-aware
+    /// so a proxy (which mirrors overdrive state) replays the heavy swing at its own rate.</summary>
+    public float PlaybackSpeed => (_overdrive != null && _overdrive.IsActive) ? overdriveAttackPlaybackSpeed : autoAttackPlaybackSpeed;
 
     // Seconds per frame = clipLength / spanFrames, so the spanning phases fill the whole attack clip.
     // FallbackSecondsPerFrame (1/60s) covers the degenerate case where no clip is readable yet (e.g. the
@@ -142,6 +147,7 @@ public class AutoAttackController : MonoBehaviour
         _currentDamageMultiplier    = overdrive ? overdriveAttackDamageMultiplier    : 1f;
         _currentKnockbackMultiplier = overdrive ? overdriveAttackKnockbackMultiplier : 1f;
         _currentSizeMultiplier      = overdrive ? overdriveAttackHitboxSizeMultiplier : 1f;
+        _currentPlaybackSpeed       = overdrive ? overdriveAttackPlaybackSpeed        : autoAttackPlaybackSpeed;
 
         Vector2 toPoint = aimPoint - (Vector2)transform.position;
         _currentAimDir = toPoint.sqrMagnitude > 0.0001f
@@ -168,7 +174,7 @@ public class AutoAttackController : MonoBehaviour
         // (AttackMoveSpeedMultiplier, applied by the movement scripts). The animator's _attackLocked
         // still freezes the swing clip so the drift doesn't override it.
         if (takeDirection) _anim?.SetFacing(_currentAimDir);
-        _anim?.PlayAutoAttack(_currentAnim, takeDirection, autoAttackPlaybackSpeed);
+        _anim?.PlayAutoAttack(_currentAnim, takeDirection, _currentPlaybackSpeed);
 
         // Clip is now current — spread the spanning phases (startup+active+endlag) across its full length,
         // per-phase scales reshape the split, then playback speed scales the whole thing.
@@ -176,7 +182,7 @@ public class AutoAttackController : MonoBehaviour
         float fStartup = _startupFrames * startupFrameScale;
         float fActive  = _activeFrames  * activeFrameScale;
         float fEndlag  = _endlagFrames  * endlagFrameScale;
-        float perFrame = SecondsPerFrame(fStartup + fActive + fEndlag) / Mathf.Max(0.1f, autoAttackPlaybackSpeed);
+        float perFrame = SecondsPerFrame(fStartup + fActive + fEndlag) / Mathf.Max(0.1f, _currentPlaybackSpeed);
         float startup = fStartup * perFrame;
         float active  = fActive  * perFrame;
         float endlag  = fEndlag  * perFrame;

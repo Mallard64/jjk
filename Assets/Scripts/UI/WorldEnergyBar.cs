@@ -12,8 +12,6 @@ using UnityEngine.UI;
 /// </summary>
 public class WorldEnergyBar : MonoBehaviour
 {
-    private const float ChangeEpsilon = 0.001f;
-
     private enum View { Unresolved, Corner, World, Hidden }
 
     [Header("Corner UI (local player, online)")]
@@ -27,9 +25,11 @@ public class WorldEnergyBar : MonoBehaviour
     [SerializeField] private bool      hideWhenFull = false;
 
     [Header("Change Flash")]
-    [Tooltip("The fill flashes toward this colour whenever CE changes, fading back to its normal colour.")]
+    [Tooltip("The fill flashes toward this colour on a discrete CE change, fading back to its normal colour.")]
     [SerializeField] private Color flashColor    = Color.white;
     [SerializeField] private float flashDuration = 0.18f;
+    [Tooltip("Minimum CE change to flash — keeps continuous drain (domain/overdrive) and regen from flashing every frame; only real spends do.")]
+    [SerializeField] private float flashMinChange = 3f;
 
     private CursedEnergy     _energy;
     private FusionPlayerSync _net;
@@ -118,8 +118,8 @@ public class WorldEnergyBar : MonoBehaviour
     {
         if (_fill == null) return;
 
-        // Flash on any change (gain or loss), but not the initial bind.
-        if (!float.IsNaN(_lastValue) && Mathf.Abs(current - _lastValue) > ChangeEpsilon)
+        // Flash on a discrete change (spend), not continuous drain/regen, and not the initial bind.
+        if (!float.IsNaN(_lastValue) && Mathf.Abs(current - _lastValue) >= flashMinChange)
             _flashTimer = flashDuration;
         _lastValue = current;
 

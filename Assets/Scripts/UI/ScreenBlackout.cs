@@ -13,6 +13,7 @@ public class ScreenBlackout : MonoBehaviour
     public static ScreenBlackout Instance => _instance != null ? _instance : Build();
 
     private CanvasGroup _group;
+    private Image       _image;
 
     private static ScreenBlackout Build()
     {
@@ -40,8 +41,25 @@ public class ScreenBlackout : MonoBehaviour
 
         _instance = go.AddComponent<ScreenBlackout>();
         _instance._group = group;
+        _instance._image = image;
         return _instance;
     }
+
+    /// <summary>Set the overlay colour (RGB only; alpha stays driven by FadeTo), then fade as usual.
+    /// Used for the online round transition, which fades to white instead of black.</summary>
+    public IEnumerator FadeTo(float target, float duration, Color color)
+    {
+        if (_image != null)
+        {
+            var c = _image.color;
+            c.r = color.r; c.g = color.g; c.b = color.b;
+            _image.color = c;
+        }
+        yield return FadeTo(target, duration);
+    }
+
+    /// <summary>Snap the overlay alpha instantly (0 = clear). Used to clear a leftover fade between matches.</summary>
+    public void SetAlpha(float alpha) { if (_group != null) _group.alpha = alpha; }
 
     /// <summary>Lerp the overlay alpha to `target` (0 = clear, 1 = black) over `duration` seconds.</summary>
     public IEnumerator FadeTo(float target, float duration)

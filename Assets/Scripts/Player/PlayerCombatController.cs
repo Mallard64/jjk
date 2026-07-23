@@ -61,10 +61,12 @@ public class PlayerCombatController : MonoBehaviour
         if (_net != null) return; // online: FusionPlayerCombat drives attacks
         if (_health != null && _health.IsDead) return;
         if (_input == null) return;
+        if (BaseDomainExpansion.PlayersFrozen) return;  // frozen while a domain forms
 
-        // Overdrive is a toggle: each Shift press flips it on/off. Done outside the hitstun gate so
-        // you can toggle while staggered; PlayerOverdrive forces itself off on death.
-        if (_overdrive != null && _input.OverdriveDown) _overdrive.Toggle();
+        // Overdrive is a toggle: each Shift press flips it on/off. Suppressed while a domain is up — the
+        // domain controls overdrive (free) — so a stray press can't drop it.
+        if (_overdrive != null && _input.OverdriveDown && (_domain == null || !_domain.IsActive))
+            _overdrive.Toggle();
 
         if (_anim != null && _anim.IsHitstun) return;
 

@@ -66,6 +66,7 @@ public class PlayerMovement : MonoBehaviour
     private PlayerRoll _roll;
     private PlayerOverdrive _overdrive;
     private AutoAttackController _auto;
+    private BaseDomainExpansion _domain;
     private FusionPlayerSync _net;
 
     void Awake()
@@ -76,6 +77,7 @@ public class PlayerMovement : MonoBehaviour
         _roll = GetComponent<PlayerRoll>();
         _overdrive = GetComponent<PlayerOverdrive>();
         _auto = GetComponent<AutoAttackController>();
+        _domain = GetComponent<BaseDomainExpansion>();
         _net = GetComponent<FusionPlayerSync>();
     }
 
@@ -86,6 +88,9 @@ public class PlayerMovement : MonoBehaviour
         // and PlayerMovement should keep driving movement here.
         if (_net != null && _net.Object != null && _net.Object.IsValid) return;
 
+        // Both fighters freeze while a domain is forming (its 0.5s startup).
+        if (BaseDomainExpansion.PlayersFrozen) { _rb.velocity = Vector2.zero; return; }
+
         // While locked (attack lock, hurt lock, death), don't override velocity — that
         // lets knockback impulses survive HurtLock. Linear drag on the rigidbody decays them.
         if (!CanMove) return;
@@ -95,6 +100,7 @@ public class PlayerMovement : MonoBehaviour
         var input = _input != null ? _input.Current : default;
         Vector2 move = input.MoveDir;
         float speed = moveSpeed * (_overdrive != null ? _overdrive.MoveSpeedMultiplier : 1f);
+        if (_domain != null) speed *= _domain.MoveSpeedMultiplier;  // domain bonus (owner only)
         // Mid auto attack the player drifts at a reduced speed for repositioning (the swing anim is
         // frozen by the animator's attack lock, so this drift won't break it).
         if (_auto != null && _auto.IsAttacking) speed *= _auto.AttackMoveSpeedMultiplier;
