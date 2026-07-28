@@ -141,6 +141,11 @@ public class AimableAttackController : MonoBehaviour
         _aiming = true;
     }
 
+    /// <summary>Online mirror for a peer that doesn't simulate this fighter: the server owns the real aim
+    /// state, but the controlling client still needs IsAiming so its reticle expands while the key is held.
+    /// Mirrors BaseDomainExpansion.SetNetworkActive — callers gate on not being the state authority.</summary>
+    public void SetNetworkAiming(bool aiming) => _aiming = aiming;
+
     /// <summary>Release-to-fire. No-op if not currently aiming, on cooldown, or without enough cursed energy
     /// (CE can drain below the cost mid-aim under overdrive, so re-check here).</summary>
     public void ReleaseAttack(Vector2 aimPoint)

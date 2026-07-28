@@ -2,41 +2,47 @@ using Fusion;
 using UnityEngine;
 
 /// <summary>
-/// Shared Mode combat. Captures attack/aimable/domain input on the authority, fires
-/// AutoAttackController / AimableAttackController in FixedUpdateNetwork, and replicates attack
-/// starts + hit reactions to proxies via RPC. Damage is applied via RpcTakeDamage on the victim's
-/// authority. Aimable is hold-Q to aim, release-Q to fire.
+/// Host mode combat. Only the server simulates: it reads the controlling peer's FusionPlayerInput,
+/// fires AutoAttackController / AimableAttackController in FixedUpdateNetwork, and replicates attack
+/// starts and hit reactions to the other peers via RPC. Damage is dealt server-side by Hurtbox, which
+/// calls ReplicateHurt so remote peers play the matching reaction.
+/// Aimable is hold-Q to aim, release-Q to fire — resolved from button edges, so a tap can't be lost.
 /// </summary>
 public class FusionPlayerCombat : NetworkBehaviour
 {
-    [Networked] public NetworkBool NetworkedOverdrive { get; set; }
-    [Networked] public NetworkBool NetworkedDomainActive { get; set; }
+    [Networked] public NetworkBool NetworkedOverdrive     { get; set; }
+    [Networked] public NetworkBool NetworkedDomainActive  { get; set; }
     [Networked] public NetworkBool NetworkedDomainStartup { get; set; }
+    // Aim mode lives on the server, but the controlling client needs it to size its own reticle.
+    [Networked] public NetworkBool NetworkedAiming        { get; set; }
 
-    private Rigidbody2D               _rb;
     private PlayerHealth              _health;
     private PlayerAnimationController _anim;
     private AutoAttackController      _auto;
     private AimableAttackController   _aimable;
     private BaseDomainExpansion       _domain;
     private PlayerOverdrive           _overdrive;
+    private PlayerCombatController    _combat;
 
-    private bool _attackPressed, _aimableDown, _aimableUp, _domainPressed, _overdrivePressed;
+    // Server-side only (no client prediction, so no resimulation): last received input plus the previous
+    // button state the press/release edges are taken against.
+    private FusionPlayerInput _input;
+    private NetworkButtons    _prevButtons;
 
     void Awake()
     {
-        _rb        = GetComponent<Rigidbody2D>();
         _health    = GetComponent<PlayerHealth>();
         _anim      = GetComponent<PlayerAnimationController>();
         _auto      = GetComponent<AutoAttackController>();
         _aimable   = GetComponent<AimableAttackController>();
         _domain    = GetComponent<BaseDomainExpansion>();
         _overdrive = GetComponent<PlayerOverdrive>();
+        _combat    = GetComponent<PlayerCombatController>();
     }
 
     public override void Spawned()
     {
-        // Replicate auto/aimable attacks to proxies so they see the punch/skill anim too.
+        // Replicate auto/aimable attacks to remote peers so they see the punch/skill anim too.
         if (_auto != null)
         {
             _auto.OnAttackStarted += OnLocalAutoAttackStarted;
@@ -63,193 +69,157 @@ public class FusionPlayerCombat : NetworkBehaviour
         }
     }
 
-    void Update()
-    {
-        if (Object == null || !Object.IsValid || !HasStateAuthority) return;
-        if (Input.GetMouseButtonDown(0))        _attackPressed    = true;
-        if (Input.GetKeyDown(KeyCode.Q))        _aimableDown      = true;
-        if (Input.GetKeyUp(KeyCode.Q))          _aimableUp        = true;
-        if (Input.GetKeyDown(KeyCode.E))        _domainPressed    = true;
-        if (Input.GetKeyDown(KeyCode.LeftShift)) _overdrivePressed = true;
-    }
-
     public override void FixedUpdateNetwork()
     {
         if (!HasStateAuthority) return;
 
-        // Replicate our domain's open/closed + forming state every tick so the opponent's peer can apply
+        // Advance the button edges every tick, even while dead or frozen — a key held through a freeze
+        // must not fire the moment control returns (this replaces the old buffered-press clearing).
+        if (GetInput(out FusionPlayerInput received)) _input = received;
+        NetworkButtons pressed  = _input.Buttons.GetPressed(_prevButtons);
+        NetworkButtons released = _input.Buttons.GetReleased(_prevButtons);
+        _prevButtons = _input.Buttons;
+
+        // Replicate our domain's open/closed + forming state every tick so the other peer can apply
         // its cross-player effects (overdrive lock / regen freeze), the startup freeze, and the VFX/arena.
         NetworkedDomainActive  = _domain != null && _domain.IsActive;
         NetworkedDomainStartup = _domain != null && _domain.IsStartingUp;
+        NetworkedAiming        = _aimable != null && _aimable.IsAiming;
 
         if (_health != null && _health.IsDead)
         {
-            _overdrivePressed = false;
             if (NetworkedOverdrive) NetworkedOverdrive = false;
             _overdrive?.SetActive(false);
             return;
         }
 
-        // Frozen during the death → respawn round reset: drop buffered input, kill overdrive.
+        // Frozen during the death → respawn round reset: kill overdrive, ignore this tick's edges.
         if (FusionPlayerSync.RoundResetting)
         {
-            _attackPressed = _aimableDown = _aimableUp = _domainPressed = _overdrivePressed = false;
             if (NetworkedOverdrive) NetworkedOverdrive = false;
             _overdrive?.SetActive(false);
             return;
         }
 
-        // Frozen while a domain forms (its 0.5s startup): drop buffered input.
-        if (BaseDomainExpansion.PlayersFrozen)
-        {
-            _attackPressed = _aimableDown = _aimableUp = _domainPressed = _overdrivePressed = false;
-            return;
-        }
+        // Frozen while a domain forms (its 0.5s startup).
+        if (BaseDomainExpansion.PlayersFrozen) return;
 
         // Overdrive is a toggle: each Shift press flips the replicated state. While our domain is up the
         // domain controls overdrive (free) — ignore presses and just mirror the real state.
-        if (_domain != null && _domain.IsActive)
+        if (_domain == null || !_domain.IsActive)
         {
-            _overdrivePressed = false;
-        }
-        else
-        {
-            if (_overdrivePressed)
-            {
-                NetworkedOverdrive = !NetworkedOverdrive;
-                _overdrivePressed  = false;
-            }
+            if (pressed.IsSet(PlayerButton.Overdrive)) NetworkedOverdrive = !NetworkedOverdrive;
             _overdrive?.SetActive(NetworkedOverdrive);
         }
         // Re-sync to the real state (SetActive can refuse when domain-locked; domain-free forces it on),
-        // so the networked flag — and the proxy tint — always tracks what's really happening.
+        // so the networked flag — and the remote tint — always tracks what's really happening.
         if (_overdrive != null) NetworkedOverdrive = _overdrive.IsActive;
 
-        // Match offline behavior (PlayerCombatController early-returns on hitstun): drop buffered
-        // presses so a key tapped during the hurt animation doesn't fire the moment hitstun ends.
-        if (_anim != null && _anim.IsHitstun)
-        {
-            _attackPressed = _aimableDown = _aimableUp = _domainPressed = false;
-            return;
-        }
+        // Match offline behavior (PlayerCombatController early-returns on hitstun): a key pressed during
+        // the hurt animation is ignored rather than queued.
+        if (_anim != null && _anim.IsHitstun) return;
 
-        Vector2 aimPoint = FusionPlayerSync.GetMouseWorldPoint(transform);
+        Vector2 aimPoint = _input.AimPoint;
 
-        if (_attackPressed)
-        {
-            _auto?.TryAttack(aimPoint);
-            _attackPressed = false;
-        }
-        if (_aimableDown)
-        {
-            _aimable?.StartAiming();
-            _aimableDown = false;
-        }
-        if (_aimableUp)
-        {
-            _aimable?.ReleaseAttack(aimPoint);
-            _aimableUp = false;
-        }
-        if (_domainPressed && _domain != null)
+        if (pressed.IsSet(PlayerButton.AutoAttack)) _auto?.TryAttack(aimPoint);
+        if (pressed.IsSet(PlayerButton.Aimable))    _aimable?.StartAiming();
+        if (released.IsSet(PlayerButton.Aimable))   _aimable?.ReleaseAttack(aimPoint);
+
+        if (pressed.IsSet(PlayerButton.Domain) && _domain != null)
         {
             if (_domain.IsActive) _domain.Deactivate();
             else                  _domain.Activate();
-            _domainPressed = false;
         }
     }
 
     public override void Render()
     {
-        // Proxies mirror the authority's overdrive state so the red tint matches what the
-        // local player sees. Authority's call here re-asserts the same state (no-op via
-        // PlayerOverdrive.SetActive's idempotent guard).
+        // Every peer that doesn't simulate this fighter mirrors the server's overdrive/domain state so the
+        // red tint, the domain arena and the freeze all match what the server is actually running.
         if (!HasStateAuthority)
         {
             _overdrive?.SetActive(NetworkedOverdrive);
-            _domain?.SetNetworkActive(NetworkedDomainActive);    // mirror opponent's domain (registry/VFX/arena)
+            _domain?.SetNetworkActive(NetworkedDomainActive);    // mirror the domain (registry/VFX/arena)
             _domain?.SetNetworkStartup(NetworkedDomainStartup);  // …and its forming state (freeze on this peer)
+            _aimable?.SetNetworkAiming(NetworkedAiming);         // …so the controlling client's reticle expands
         }
+    }
+
+    /// <summary>Server-side: tell the other peers to play this fighter's hurt reaction. HP itself
+    /// replicates through FusionPlayerSync — this is the animation, screen feedback and combo tally.</summary>
+    public void ReplicateHurt(float amount, Vector2 knockback, float hitstun, GameObject attacker)
+    {
+        if (Object == null || !Object.IsValid || !HasStateAuthority) return;
+        var attackerObject = attacker != null ? attacker.GetComponentInParent<NetworkObject>() : null;
+        RpcHurt(amount, knockback, hitstun, attackerObject != null ? attackerObject.Id : default);
+    }
+
+    // Targets All, not Proxies: the hit player's own client is this object's INPUT authority, not a proxy,
+    // so a Proxies-only RPC would skip the peer that most needs to see the hit. InvokeLocal is off because
+    // the server already reacted locally through PlayerHealth.OnDamaged.
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+    public void RpcHurt(float amount, Vector2 knockback, float hitstun, NetworkId attackerId)
+    {
+        // Capture before PlayHurt flips it — the combo tally needs the pre-hit stun state.
+        bool wasStunned = _anim != null && _anim.IsHitstun;
+
+        _anim?.SetFacingFromHit(knockback);
+        _anim?.SetNextHitstun(hitstun);
+        _anim?.PlayHurt();
+
+        // Screen shake / flash belong to the peer whose fighter got hit, not to whoever simulated it.
+        if (HasInputAuthority) _combat?.PlayDamageFeedback(amount);
+
+        // The combo readout is per-peer and shows only your own offense, matching the offline behaviour.
+        if (!attackerId.IsValid) return;
+        var attacker = Runner.FindObject(attackerId);
+        if (attacker != null && attacker.HasInputAuthority)
+            ComboCounter.Instance.Register(attacker.gameObject, _anim, wasStunned);
     }
 
     private void OnLocalAutoAttackStarted(string action, Vector2 facing)
     {
-        if (HasStateAuthority) RpcAutoAttackStartedOnProxies(action, facing);
+        if (HasStateAuthority) RpcAutoAttackStarted(action, facing);
     }
 
     private void OnLocalAutoAttackEnded()
     {
-        if (HasStateAuthority) RpcAutoAttackEndedOnProxies();
+        if (HasStateAuthority) RpcAutoAttackEnded();
     }
 
     private void OnLocalAimableAttackStarted(Vector2 aimDir, string action)
     {
-        if (HasStateAuthority) RpcAimableAttackStartedOnProxies(aimDir, action);
+        if (HasStateAuthority) RpcAimableAttackStarted(aimDir, action);
     }
 
     private void OnLocalAimableAttackEnded()
     {
-        if (HasStateAuthority) RpcAimableAttackEndedOnProxies();
+        if (HasStateAuthority) RpcAimableAttackEnded();
     }
 
-    // Hitter calls this on the victim. Only the victim's StateAuthority actually applies damage.
-    // FusionPlayerSync's OnLocalHealthChanged / OnLocalDeath subscriptions propagate the HP/death
-    // change into [Networked] state for proxies — no manual mirror needed here.
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RpcTakeDamage(float amount, Vector2 knockback, float hitstun)
-    {
-        if (_health == null || _health.IsDead || _health.IsInvincible) return;
-
-        // Face away from the hit BEFORE the hurt anim so the post-hurt idle uses the correct facing.
-        _anim?.SetFacingFromHit(knockback);
-        _anim?.SetNextHitstun(hitstun);
-
-        _health.TakeDamage(amount);
-
-        if (_rb != null && _rb.simulated && !_health.IsDead)
-        {
-            // Combo decay: TakeDamage just ran PlayHurt, so the multiplier reflects this hit's combo depth.
-            float comboScale = _anim != null ? _anim.ComboKnockbackMultiplier : 1f;
-            Vector2 impulse = knockback * comboScale;
-            _rb.AddForce(impulse, ForceMode2D.Impulse);
-            _anim?.SetLastHitKnockback(impulse.magnitude);  // a later wall collision uses this for the splat
-            _anim?.CheckWallSplatOnHit();                   // …or splat now if already pinned to a wall
-        }
-
-        // Authority's own hurt animation fires via OnDamaged -> PlayerCombatController. Tell proxies separately.
-        RpcPlayHurtOnProxies(knockback, hitstun);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies)]
-    public void RpcPlayHurtOnProxies(Vector2 knockback, float hitstun)
-    {
-        _anim?.SetFacingFromHit(knockback);
-        _anim?.SetNextHitstun(hitstun);
-        _anim?.PlayHurt();
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies)]
-    public void RpcAutoAttackStartedOnProxies(string action, Vector2 facing)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+    public void RpcAutoAttackStarted(string action, Vector2 facing)
     {
         bool directional = _auto == null || _auto.TakeDirection;
         if (directional) _anim?.SetFacing(facing);
         _anim?.PlayAutoAttack(action, directional, _auto != null ? _auto.PlaybackSpeed : 1f);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies)]
-    public void RpcAutoAttackEndedOnProxies()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+    public void RpcAutoAttackEnded()
     {
         _anim?.RefreshMovementState();
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies)]
-    public void RpcAimableAttackStartedOnProxies(Vector2 aimDir, string action)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+    public void RpcAimableAttackStarted(Vector2 aimDir, string action)
     {
         bool directional = _aimable == null || _aimable.TakeDirection;
         _anim?.PlayAimableAttack(aimDir, action, directional, _aimable != null ? _aimable.PlaybackSpeed : 1f);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies)]
-    public void RpcAimableAttackEndedOnProxies()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+    public void RpcAimableAttackEnded()
     {
         _anim?.RefreshMovementState();
     }

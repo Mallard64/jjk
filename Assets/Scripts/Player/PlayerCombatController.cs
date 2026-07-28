@@ -104,9 +104,17 @@ public class PlayerCombatController : MonoBehaviour
         _aimable?.Cancel();
         _anim?.PlayHurt();
 
-        // Cumulative damage feedback, scaled by how hard the hit landed. OnDamaged only fires on the
-        // victim's authority in online play (proxies use ForceSetHp, which fires OnHealthChanged not
-        // OnDamaged) — so these effects only affect the hit player's own view.
+        // Online this fires on the SERVER for both fighters, so the feedback is limited to the one this
+        // peer controls — the hit client gets its own via FusionPlayerCombat.RpcHurt. Offline, _net is
+        // dormant and both players fire locally as before.
+        if (_net == null || _net.Object == null || !_net.Object.IsValid || _net.IsLocalPlayer)
+            PlayDamageFeedback(amount);
+    }
+
+    /// <summary>Screen feedback for a hit taken by the fighter this peer is watching, scaled by how hard
+    /// it landed. Also called by FusionPlayerCombat.RpcHurt on the client whose fighter was hit.</summary>
+    public void PlayDamageFeedback(float amount)
+    {
         bool high = amount >= highDamageThreshold;
         ScreenEffects.Instance?.Flash(high ? Color.white : Color.red);
         if (amount >= midDamageThreshold) CameraShake.Instance?.Shake();

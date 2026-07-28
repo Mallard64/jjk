@@ -15,16 +15,16 @@
     "AllowClientServerModesInWebGL": false,
     "ClientsRecordFrameAndPacketTimingTraces": false,
     "Simulation": {
-        "InputDataWordCount": 0,
+        "InputDataWordCount": 8,
         "ReplicationFeatures": 1,
         "InputTransferMode": 0,
         "SimulationUpdateTimeMode": 0,
         "PlayerCount": 10,
         "TickRateSelection": {
-            "Client": 64,
+            "Client": 100,
             "ServerIndex": 0,
-            "ClientSendIndex": 1,
-            "ServerSendIndex": 1
+            "ClientSendIndex": 0,
+            "ServerSendIndex": 0
         },
         "MaxObjectDestroysSentPerPacket": 32,
         "EnableExperimentalPacketLossRecovery": false,

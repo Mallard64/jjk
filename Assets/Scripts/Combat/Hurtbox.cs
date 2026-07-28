@@ -16,25 +16,17 @@ public class Hurtbox : MonoBehaviour
         _anim      = GetComponentInParent<PlayerAnimationController>();
     }
 
+    /// <summary>Apply a landed hit. Only ever reached on the simulating peer — Hitbox gates its trigger on
+    /// state authority, so this runs on the host in online play and locally when offline.</summary>
     public void ReceiveHit(float damage, Vector2 knockback, GameObject source, float hitstun)
     {
-        if (_health == null || _health.IsDead) return;
+        if (_health == null || _health.IsDead || _health.IsInvincible) return;
 
-        // Online: route through victim's StateAuthority — but only when actually network-spawned.
-        // An unspawned FusionPlayerCombat (offline player, or a training dummy placed in a scene) has
-        // no valid NetworkObject, so fall through to the direct offline path instead of RPCing into the void.
-        if (_netCombat != null && _netCombat.Object != null && _netCombat.Object.IsValid)
-        {
-            _netCombat.RpcTakeDamage(damage, knockback, hitstun);
-            return;
-        }
-
-        // Offline: apply directly. Face away from the hit before the hurt anim so the
-        // post-hurt idle/walk orients the player toward the attacker.
+        // Face away from the hit before the hurt anim so the post-hurt idle/walk orients toward the attacker.
         _anim?.SetFacingFromHit(knockback);
         _anim?.SetNextHitstun(hitstun);
         _health.TakeDamage(damage, source);
-        if (_rb != null && knockback.sqrMagnitude > 0f && !_health.IsDead)
+        if (_rb != null && _rb.simulated && knockback.sqrMagnitude > 0f && !_health.IsDead)
         {
             // Combo decay: TakeDamage just ran PlayHurt, so the multiplier reflects this hit's combo depth.
             float comboScale = _anim != null ? _anim.ComboKnockbackMultiplier : 1f;
@@ -43,5 +35,9 @@ public class Hurtbox : MonoBehaviour
             _anim?.SetLastHitKnockback(impulse.magnitude);  // a later wall collision uses this for the splat
             _anim?.CheckWallSplatOnHit();                   // …or splat now if already pinned to a wall
         }
+
+        // Online: replay the same reaction on the other peers (HP itself replicates via FusionPlayerSync).
+        // No-ops when unspawned — an offline player, or a training dummy placed in a scene.
+        _netCombat?.ReplicateHurt(damage, knockback, hitstun, source);
     }
 }

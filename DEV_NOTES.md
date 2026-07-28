@@ -111,73 +111,69 @@ Wire `WorldHealthBar` (on the root): cornerRoot=HealthBar_Corner, cornerFill=its
 
 ---
 
-## Adding Photon Fusion (When Ready)
+## Online Play — Photon Fusion 2, Host Mode
 
-### Step 1: Install Photon Fusion
-1. Create an account at photonengine.com.
-2. Create an app, get an App ID.
-3. In Unity Package Manager → Add package from URL: `https://downloads.photonengine.com/sdk/fusion/Fusion2.zip` (or use UPM feed).
-4. Add the App ID to `Fusion/Resources/PhotonAppSettings.asset`.
+Photon Fusion 2 is installed (`Assets/Photon/Fusion`, build 2.0.12). Online play runs in **Host mode**:
+one peer is the server *and* a fighter, the other is a pure client.
 
-### Step 2: Create FusionNetworkAdapter
-Create `Scripts/Network/FusionNetworkAdapter.cs`:
-```csharp
-using Fusion;
-public class FusionNetworkAdapter : NetworkBehaviour, INetworkAdapter
-{
-    public bool IsLocalPlayer => Object.HasInputAuthority;
-    public bool IsAuthority   => Object.HasStateAuthority;
+### Who does what
 
-    [Networked] public float NetworkedHp    { get; set; }
-    [Networked] public float NetworkedEnergy { get; set; }
+| Role   | State authority | Input authority | Simulates |
+|--------|-----------------|-----------------|-----------|
+| Host   | both fighters   | its own fighter | everything: movement, attacks, damage, CE/HP drain, domains, scoring |
+| Client | none            | its own fighter | nothing — it sends input and renders replicated state |
 
-    // Sync HP and energy on State Authority (server/host)
-    // Use ChangeDetector or [Networked(OnChanged = ...)] to update local UI
+This is why `INetworkAdapter` has two flags that used to mean the same thing under Shared Mode:
 
-    public void SendInput(PlayerInputData input)
-    {
-        // Fusion input is sent via INetworkInput struct in SimulationBehaviour
-        // Define a FusionPlayerInput struct with the same fields as PlayerInputData
-    }
-}
-```
+- `IsAuthority` → **state** authority: "do I simulate this fighter?" Gate anything that must happen
+  exactly once (damage, resource drain, scoring) on it.
+- `IsLocalPlayer` → **input** authority: "is this the fighter I control?" Gate local-view concerns
+  (aiming reticle, corner HUD, screen shake, combo readout) on it.
 
-### Step 3: Define Fusion Input Struct
-```csharp
-using Fusion;
-public struct FusionPlayerInput : INetworkInput
-{
-    public Vector2 MoveDir;
-    public Vector2 AimDir;
-    public NetworkBool AutoAttack;
-    public NetworkBool AimableAttack;
-    public NetworkBool Domain;
-}
-```
+Getting these backwards is the main failure mode: keying HUD off `IsAuthority` puts the opponent's bar
+in the host's corner, and keying damage off `IsLocalPlayer` lets a client claim hits.
 
-### Step 4: Replace LocalNetworkAdapter
-On player prefabs, swap `LocalNetworkAdapter` for `FusionNetworkAdapter`.
-Add `NetworkObject`, `NetworkTransform` (position sync), `NetworkRigidbody2D` (if physics).
+### Running a match
+1. Open `Assets/Scenes/Arena.unity` (it must be in Build Settings — `SceneRef.FromIndex` uses its index).
+2. Confirm your App ID is set in `Assets/Photon/Fusion/Resources/PhotonAppSettings.asset`.
+3. Build and run on machine A, type a room name, press **Host Match**.
+4. Run on machine B with the same room name, press **Join Match**.
 
-### Step 5: Authority-Validated Hits
-In `Hitbox.cs`, gate damage calls behind `IsAuthority`:
-```csharp
-if (!_networkAdapter.IsAuthority) return; // Only server applies damage
-```
+Both peers must be on the same Photon region for the room to be visible.
 
-### Step 6: Match Manager → Fusion Room
-Replace `MatchManager.StartMatch()` with Fusion's `NetworkRunner.StartGame()`.
-Room creation is minimal: host creates, client joins via JoinOrCreate or specific room code.
+### What syncs, and how
 
-### Fusion Sync Summary
-| Data          | Sync method                     |
-|---------------|---------------------------------|
-| Position      | NetworkTransform                |
-| HP            | [Networked] on FusionNetworkAdapter |
-| Energy        | [Networked] on FusionNetworkAdapter |
-| IsDead        | [Networked] bool                |
-| Input         | INetworkInput struct            |
-| Attack events | [Rpc] (fire-and-forget)         |
+| Data                                     | Mechanism |
+|------------------------------------------|-----------|
+| Position / velocity                      | `NetworkRigidbody2D` (server-driven, interpolated on remotes) |
+| HP / CE / dead / round wins              | `[Networked]` on `FusionPlayerSync`, mirrored in `Render()` |
+| Move + aim direction                     | `[Networked]` on `FusionPlayerMovement` |
+| Overdrive / domain / aiming state        | `[Networked]` on `FusionPlayerCombat`, mirrored in `Render()` |
+| Round freeze                             | `[Networked] NetworkedRoundResetting`, read via the static `FusionPlayerSync.RoundResetting` |
+| Player input                             | `FusionPlayerInput` (`INetworkInput`), polled once in `GameLauncher.OnInput` |
+| Attack / roll / hurt one-shots           | `[Rpc]` — `RpcTargets.All`, `InvokeLocal = false` |
+
+**Never use `RpcTargets.Proxies`.** In host mode the client controlling a fighter is that object's *input*
+authority, not a proxy, so a Proxies-only RPC skips exactly the peer that pressed the button.
+
+### Input and button edges
+`GameLauncher.OnInput` is the single input poll per peer. Buttons ride as `NetworkButtons` carrying the raw
+**held** state; the server derives edges with `GetPressed` / `GetReleased` against the previous tick. That is
+what makes hold-to-aim / release-to-fire survive a dropped packet, and why a key held through a round-reset
+freeze does not fire the moment control returns. `PlayerButton`'s ordering is part of the wire format —
+append, never reorder. If you add fields to `FusionPlayerInput`, raise
+`Simulation.InputDataWordCount` in `Assets/Photon/Fusion/Resources/NetworkProjectConfig.fusion`
+(currently 8 words; the struct uses 5).
+
+### Known limits
+- **Combat actions still cost one RTT on a client.** Movement is predicted, but attacks, rolls and domains
+  are resolved server-side and replicated by RPC, so there is a round trip between the press and the swing.
+  Predicting them would mean making every attack controller's phase state `[Networked]` and rewindable —
+  a much larger change than the movement prediction, and easy to desync.
+- **Projectiles are not replicated.** `AttackHitboxController` uses a plain `Instantiate` on the simulating
+  peer, so a projectile attack is visible on the host but not on the client. Damage still resolves correctly
+  server-side. Fixing this means putting a `NetworkObject` on each projectile prefab and using `Runner.Spawn`.
+- **No host migration.** If the host leaves, the match ends.
 
 ---
 

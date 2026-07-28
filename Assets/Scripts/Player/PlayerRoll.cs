@@ -28,6 +28,7 @@ public class PlayerRoll : MonoBehaviour
     private PlayerMovement            _movement;
     private AutoAttackController      _auto;
     private AimableAttackController   _aimable;
+    private FusionPlayerSync          _net;
 
     private float _cooldownTimer;
     private Coroutine _rollRoutine;
@@ -49,6 +50,7 @@ public class PlayerRoll : MonoBehaviour
         _movement  = GetComponent<PlayerMovement>();
         _auto      = GetComponent<AutoAttackController>();
         _aimable   = GetComponent<AimableAttackController>();
+        _net       = GetComponent<FusionPlayerSync>();
 
         // Attacking during a roll trades the roll's i-frames for offensive commitment.
         if (_auto    != null) _auto.OnAttackStarted    += OnAutoAttackStartedDuringRoll;
@@ -78,8 +80,18 @@ public class PlayerRoll : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Sustain dash velocity for the whole roll window. Otherwise rigidbody drag decays the
-        // impulse over the duration, cutting effective distance roughly in half.
+        // Offline only. Online, physics steps on network ticks rather than Unity's fixed timestep, so
+        // re-asserting here lands out of phase with the step and the dash comes up short — the online
+        // layer calls SustainDash() from FixedUpdateNetwork instead.
+        if (_net != null && _net.Object != null && _net.Object.IsValid) return;
+        SustainDash();
+    }
+
+    /// <summary>Re-assert dash velocity for this step. Without it, rigidbody drag decays the impulse over
+    /// the roll window and cuts the effective distance roughly in half. Must be called once per physics
+    /// step: Unity's FixedUpdate offline, FixedUpdateNetwork online.</summary>
+    public void SustainDash()
+    {
         if (!IsRolling || _rb == null || !_rb.simulated) return;
         _rb.velocity = _rollDir * rollDashSpeed;
     }
@@ -130,12 +142,14 @@ public class PlayerRoll : MonoBehaviour
         // If an attack started during the roll, leave movement-lock and anim state for the
         // attack's own routine to clear — otherwise the roll truncates the attack mid-swing.
         bool attackInProgress = (_auto != null && _auto.IsAttacking) || (_aimable != null && _aimable.IsAttacking);
-        if (!attackInProgress)
-        {
-            _movement?.SetCanMove(true);
-            _anim?.RefreshMovementState();
-        }
         _rollRoutine = null;
+        if (attackInProgress) yield break;
+
+        _movement?.SetCanMove(true);
+        _anim?.RefreshMovementState();
+        // Only announce the end when the roll actually handed control back. Firing it unconditionally
+        // replicated a RefreshMovementState to remote peers that wiped the attack animation they had
+        // just been told to play — the attack's own end RPC refreshes them instead.
         OnRollEnded?.Invoke();
     }
 }

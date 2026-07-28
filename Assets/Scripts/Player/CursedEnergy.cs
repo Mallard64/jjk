@@ -25,13 +25,21 @@ public class CursedEnergy : MonoBehaviour
 
     private float _regenSuppressTimer;
 
+    private FusionPlayerSync _net;
+
     void Awake()
     {
         CurrentEnergy = maxEnergy;
+        _net = GetComponent<FusionPlayerSync>();
     }
 
     void Update()
     {
+        // Online only the simulating peer regenerates; everyone else takes the replicated value from
+        // FusionPlayerSync. Regenerating locally too would fight that mirror and flicker the bar.
+        // Checked against a live NetworkObject so an unspawned adapter (offline play) still regenerates.
+        if (_net != null && _net.Object != null && _net.Object.IsValid && !_net.IsAuthority) return;
+
         if (_regenSuppressTimer > 0f)
         {
             _regenSuppressTimer -= Time.deltaTime;

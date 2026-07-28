@@ -90,7 +90,7 @@ public class WorldEnergyBar : MonoBehaviour
         bool online = _net != null && _net.Object != null && _net.Object.IsValid;
         View desired;
         if (_forceWorld) desired = View.World;                              // training dummy: always head bar
-        else if (online) desired = _net.IsAuthority ? View.Corner : View.Hidden; // opponent: never reveal CE
+        else if (online) desired = _net.IsLocalPlayer ? View.Corner : View.Hidden; // opponent: never reveal CE
         else             desired = View.World;                             // offline: both players local
         if (desired == _view) return;
 

@@ -2,20 +2,20 @@ using UnityEngine;
 
 /// <summary>
 /// Abstraction layer between gameplay code and the networking backend.
-/// Implement LocalNetworkAdapter for offline play. FusionPlayerSync implements this for Shared Mode online play.
+/// LocalNetworkAdapter covers offline play; FusionPlayerSync implements this for Host mode online play,
+/// where the two flags below stop being the same thing.
 /// </summary>
 public interface INetworkAdapter
 {
+    /// <summary>Is this the fighter this peer controls? (Fusion: input authority.) Drives local-view
+    /// concerns — the aiming reticle, the corner HUD, screen shake, the combo readout.</summary>
     bool IsLocalPlayer { get; }
+
+    /// <summary>Does this peer simulate this fighter? (Fusion: state authority — in Host mode the server,
+    /// for BOTH fighters.) Gates anything that must happen exactly once: damage, resource drain, scoring.</summary>
     bool IsAuthority { get; }
 
-    /// <summary>
-    /// Send this player's input to the authority (server or host).
-    /// In local play, this is a no-op — input is already local.
-    /// </summary>
+    /// <summary>Offline no-op — input is already local. Online, GameLauncher.OnInput is the network
+    /// input path, so nothing routes through here.</summary>
     void SendInput(PlayerInputData input);
-
-    // TODO: Add Photon Fusion INetworkRunner hooks here when integrating Fusion.
-    // Replace [Command]/[ClientRpc] with Fusion's [Rpc] and Networked properties.
-    // See DEV_NOTES.md → "Adding Photon Fusion" for setup steps.
 }

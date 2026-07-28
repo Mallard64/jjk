@@ -132,9 +132,10 @@ public class AimingReticle : MonoBehaviour
 
     private bool IsLocalView()
     {
-        // Online: only show on the authority's machine for their own player.
+        // Online: only the peer that controls this fighter sees its reticle. In host mode that is input
+        // authority, not state authority — the server simulates both fighters but only aims its own.
         if (_net != null && _net.Object != null && _net.Object.IsValid)
-            return _net.IsAuthority;
+            return _net.IsLocalPlayer;
         // Offline: PlayerInputHandler exists per-player, both are on the same machine.
         return _input != null;
     }
@@ -143,7 +144,7 @@ public class AimingReticle : MonoBehaviour
     {
         // Online local: derive from mouse, anchored at the offset point so the reticle
         // rotates exactly around its visible base instead of the player's feet.
-        if (_net != null && _net.Object != null && _net.Object.IsValid && _net.IsAuthority)
+        if (_net != null && _net.Object != null && _net.Object.IsValid && _net.IsLocalPlayer)
         {
             if (Camera.main == null) return Vector2.right;
             Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -158,7 +159,7 @@ public class AimingReticle : MonoBehaviour
 
     private Vector2 ResolveAimPoint()
     {
-        if (_net != null && _net.Object != null && _net.Object.IsValid && _net.IsAuthority)
+        if (_net != null && _net.Object != null && _net.Object.IsValid && _net.IsLocalPlayer)
             return FusionPlayerSync.GetMouseWorldPoint(transform);
         if (_input != null) return _input.Current.AimPoint;
         return transform.position;

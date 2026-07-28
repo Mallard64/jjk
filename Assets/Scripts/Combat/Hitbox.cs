@@ -24,12 +24,9 @@ public class Hitbox : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // In online play, only the state authority applies damage to prevent double hits
-        if (_owner != null)
-        {
-            var adapter = _owner.GetComponent<INetworkAdapter>();
-            if (adapter != null && !adapter.IsAuthority) return;
-        }
+        // Online, only the simulating peer (the host) resolves hits — clients never claim damage.
+        var adapter = _owner != null ? _owner.GetComponent<INetworkAdapter>() : null;
+        if (adapter != null && !adapter.IsAuthority) return;
 
         if (_owner != null && other.transform.IsChildOf(_owner.transform)) return;
 
@@ -55,6 +52,9 @@ public class Hitbox : MonoBehaviour
         Vector2 knockbackDir = (other.transform.position - transform.position).normalized;
         hurtbox.ReceiveHit(dealt, knockbackDir * knockbackForce * _knockbackMultiplier, _owner, hitstun);
 
-        if (connects && !isDummy) ComboCounter.Instance.Register(_owner, victimAnim, victimStunned);
+        // The combo readout is per-peer and shows only your own offense. Online the host simulates both
+        // fighters, so tally only the one it controls — the client's combo comes back via FusionPlayerCombat.RpcHurt.
+        bool ownHit = adapter == null || adapter.IsLocalPlayer;
+        if (connects && !isDummy && ownHit) ComboCounter.Instance.Register(_owner, victimAnim, victimStunned);
     }
 }

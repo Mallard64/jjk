@@ -283,7 +283,6 @@ GameObject:
   - component: {fileID: 235377968952828143}
   - component: {fileID: 235377968952828144}
   - component: {fileID: 1166553388770011044}
-  - component: {fileID: 1166553388770099002}
   m_Layer: 1
   m_Name: Player
   m_TagString: Player1
@@ -337,7 +336,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
@@ -514,14 +513,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1790634640250965085}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0
+  m_Script: {fileID: 11500000, guid: c5e690b5fb1084f5ab1c86457af401d4, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
   SyncScale: 0
   SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 1
 --- !u!114 &5781714276089560871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,6 +535,8 @@ MonoBehaviour:
   _NetworkedDead:
     _value: 0
   _NetworkedRoundWins: 0
+  _NetworkedRoundResetting:
+    _value: 0
   deathLinger: 1
   fadeDuration: 0.35
   roundEndHold: 2
@@ -643,6 +641,8 @@ MonoBehaviour:
     _value: 0
   _NetworkedDomainStartup:
     _value: 0
+  _NetworkedAiming:
+    _value: 0
 --- !u!114 &5781714276089560901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -719,7 +719,7 @@ MonoBehaviour:
   aimableAttackEnergyCost: 20
   startupFrameScale: 1
   jumpFrameScale: 1
-  impactFrameScale: 1
+  impactFrameScale: 0.99883
   endlagFrameScale: 1
   aimableAttackAnim: skill
   takeDirection: 0
@@ -2758,17 +2758,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1166553388770099002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1790634640250965085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 601194057b604930909fb67b7e1ff9c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  smoothTime: 0.05
-  snapDistance: 2

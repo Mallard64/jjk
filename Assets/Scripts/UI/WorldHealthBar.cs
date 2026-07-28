@@ -95,8 +95,9 @@ public class WorldHealthBar : MonoBehaviour
     private void Resolve()
     {
         bool online = _net != null && _net.Object != null && _net.Object.IsValid;
-        // Corner UI only for the online local player; everyone else (and any forced) gets the world head bar.
-        bool world = _forceWorld || !(online && _net.IsAuthority);
+        // Corner UI only for the fighter this peer controls (input authority, not the simulating server);
+        // everyone else (and any forced) gets the world head bar.
+        bool world = _forceWorld || !(online && _net.IsLocalPlayer);
         if (_resolved && world == _world) return;
 
         _resolved = true;
