@@ -10,11 +10,9 @@ A 2D top-down 1v1 fighting game built in Unity, with an original **cursed-energy
 
 ## Demo
 
-<!-- Add a GIF here — the single highest-impact thing you can do for this README.
-     Suggested clips: (1) a combo into a wall-splat, (2) overdrive stance + heavy attack,
-     (3) a domain-expansion "clash" where both players drain each other's energy. -->
+![Local 1v1 gameplay — attacks, hit reactions, and the cursed-energy HUD](docs/demo.gif)
 
-📽️ **_Demo GIF placeholder_** — record ~10s of a combo → wall-splat and an overdrive heavy hit.
+*Local 2-player match: 8-direction movement, an aimed auto attack connecting, hitstun and screen-flash feedback on the victim, the opponent's floating health bar, and the local player's HP (red) / cursed energy (blue) draining in the corner HUD.*
 
 ---
 
@@ -100,6 +98,7 @@ Assets/
     UI/        World/corner HP + energy bars, combo counter, match/round screens, blackout
   Scenes/
     Arena.unity   the playable scene
+docs/        README media (demo GIF)
 CLAUDE.md    detailed engineering spec / working agreement for the codebase
 DEV_NOTES.md scene-setup and prefab-wiring notes
 ```
