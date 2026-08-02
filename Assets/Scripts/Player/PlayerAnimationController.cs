@@ -55,9 +55,15 @@ public class PlayerAnimationController : MonoBehaviour
     private bool _wallReactionDone;    // wall splat already triggered for the current hit
     private int _wallHitCount;         // consecutive wall hits this combo; halves wall hitstun each time
     private Coroutine _hurtRoutine;    // the active HurtLock/WallHurtLock so a wall hit can swap it
+    private PlayerAudio _audio;
     private readonly HashSet<string> _missingStateWarned = new HashSet<string>();
 
     public bool IsHitstun => _locked;
+
+    /// <summary>True when the walk animation is what's actually on screen. The moving flag holds its last
+    /// value through hitstun, attacks and death (SetIsMoving early-outs while locked), so those are excluded
+    /// here. Read by PlayerAudio to time footsteps.</summary>
+    public bool IsWalking => _isMoving && !_locked && !_attackLocked;
 
     /// <summary>Knockback multiplier for the current incoming hit: 1 for the first hit of a combo,
     /// growing each consecutive in-stun hit (capped) so combos self-terminate by pushing the victim away.
@@ -75,6 +81,12 @@ public class PlayerAnimationController : MonoBehaviour
 
         if (spriteRenderer == null)
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Roll / hurt / death sounds hang off the animation hooks below rather than off the gameplay
+        // scripts, because these three methods are the one path that runs on EVERY peer: the server (or
+        // offline player) plays them directly, remote peers through RpcRollStarted / RpcHurt / the
+        // replicated death state. One call site each, host and client alike.
+        _audio = GetComponent<PlayerAudio>();
     }
 
     public void SetMoveDirection(Vector2 dir)
@@ -122,6 +134,7 @@ public class PlayerAnimationController : MonoBehaviour
         // itself is direction-less (single state) — like hurt/death.
         if (dir.sqrMagnitude >= 0.01f) ApplyFacing(dir);
         TryPlay(BuildState(action, ""));
+        _audio?.PlayRoll();
     }
 
     // Attacks may scale the animator's playback (see AutoAttackController/AimableAttackController
@@ -206,6 +219,7 @@ public class PlayerAnimationController : MonoBehaviour
         SetAnimatorSpeed(1f);  // a hit can interrupt a sped-up attack mid-swing
         GetComponent<PlayerHealth>()?.SetInvincible(true);
         TryPlay(BuildState("hurt", ""));
+        _audio?.PlayHit();
         float lockDuration = _pendingHitstun >= 0f ? _pendingHitstun : hurtLockDuration;
         _pendingHitstun = -1f;
         _currentHitstun = lockDuration;
@@ -233,6 +247,7 @@ public class PlayerAnimationController : MonoBehaviour
         _comboHits = 0; _wallHitCount = 0;
         SetAnimatorSpeed(1f);
         TryPlay(BuildState("death", ""));
+        _audio?.PlayDeath();
     }
 
     public void ResetState()

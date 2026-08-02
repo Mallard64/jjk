@@ -37,6 +37,13 @@ public class PlayerRoll : MonoBehaviour
     public bool IsRolling => _rollRoutine != null;
     public float CooldownRemaining => Mathf.Max(0f, _cooldownTimer);
 
+    // Read by FusionPlayerMovement, which drives the online dash from networked state so the predicting
+    // client reproduces it tick for tick. Offline the dash is re-asserted in FixedUpdate below instead.
+    public float DashSpeed    => rollDashSpeed;
+    public float DashDuration => rollDuration;
+    public float RollCooldown => rollCooldown;
+    public float EnergyCost   => rollEnergyCost;
+
     // Local events the network layer listens to so it can replicate the roll anim to proxies.
     public event Action<Vector2, string> OnRollStarted;
     public event Action                  OnRollEnded;
@@ -80,23 +87,18 @@ public class PlayerRoll : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Offline only. Online, physics steps on network ticks rather than Unity's fixed timestep, so
-        // re-asserting here lands out of phase with the step and the dash comes up short — the online
-        // layer calls SustainDash() from FixedUpdateNetwork instead.
+        // Offline only. Online the dash is [Networked] state that FusionPlayerMovement applies on the
+        // server and the predicting client alike — it has to be, or a resimulated tick can't reproduce it.
+        // (Physics also steps on network ticks there, so re-asserting from here would land out of phase
+        // with the step and the dash would come up short.)
         if (_net != null && _net.Object != null && _net.Object.IsValid) return;
-        SustainDash();
+
+        // Re-assert the dash every step: without it, rigidbody drag decays the impulse over the roll
+        // window and cuts the effective distance roughly in half.
+        if (IsRolling && _rb != null && _rb.simulated) _rb.velocity = _rollDir * rollDashSpeed;
     }
 
-    /// <summary>Re-assert dash velocity for this step. Without it, rigidbody drag decays the impulse over
-    /// the roll window and cuts the effective distance roughly in half. Must be called once per physics
-    /// step: Unity's FixedUpdate offline, FixedUpdateNetwork online.</summary>
-    public void SustainDash()
-    {
-        if (!IsRolling || _rb == null || !_rb.simulated) return;
-        _rb.velocity = _rollDir * rollDashSpeed;
-    }
-
-    public bool CanRoll()
+    private bool CanRoll()
     {
         if (IsRolling || _cooldownTimer > 0f) return false;
         if (_health != null && _health.IsDead)  return false;

@@ -49,10 +49,6 @@ public abstract class BaseDomainExpansion : MonoBehaviour
     [SerializeField] private float fastFlickerInterval = 0.07f;  // at full intensity (CE near 0)
     [SerializeField] private float flickerFlashDuration = 0.05f; // how long each flicker hides the domain
 
-    [Header("Feedback (optional)")]
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip activateSfx;
-
     private static readonly List<BaseDomainExpansion> All = new List<BaseDomainExpansion>();
 
     public bool IsActive       { get; private set; }
@@ -74,6 +70,7 @@ public abstract class BaseDomainExpansion : MonoBehaviour
     private PlayerOverdrive _overdrive;
     private PlayerAnimationController _anim;
     private FusionPlayerSync _sync;
+    private PlayerAudio _audio;
     private float _burnoutTimer;
 
     private GameObject _domainInstance;
@@ -95,6 +92,7 @@ public abstract class BaseDomainExpansion : MonoBehaviour
         _overdrive = GetComponent<PlayerOverdrive>();
         _anim      = GetComponent<PlayerAnimationController>();
         _sync      = GetComponent<FusionPlayerSync>();
+        _audio     = GetComponent<PlayerAudio>();
     }
 
     void OnEnable() { if (!All.Contains(this)) All.Add(this); }
@@ -153,7 +151,9 @@ public abstract class BaseDomainExpansion : MonoBehaviour
             BeginDomainFade();               // ramp the environment in over domainFadeInDuration
             _flickerTimer = 0f;
             _flashTimer = 0f;
-            if (activateSfx != null && audioSource != null) audioSource.PlayOneShot(activateSfx);
+            // Runs on the owner and on every proxy (SetActiveState is the mirrored path), so the domain is
+            // heard on both peers for the same reason the environment appears on both.
+            _audio?.PlayDomain();
             OnDomainStarted();
         }
         else

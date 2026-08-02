@@ -34,6 +34,7 @@ public class PlayerOverdrive : MonoBehaviour
     private PlayerHealth              _health;
     private PlayerAnimationController _anim;
     private INetworkAdapter           _net;
+    private PlayerAudio               _audio;
     private Color                     _originalColor = Color.white;
     private bool                      _originalColorCaptured;
 
@@ -43,6 +44,7 @@ public class PlayerOverdrive : MonoBehaviour
         _health = GetComponent<PlayerHealth>();
         _anim   = GetComponent<PlayerAnimationController>();
         _net    = GetComponent<INetworkAdapter>();
+        _audio  = GetComponent<PlayerAudio>();
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         if (spriteRenderer != null)
         {
@@ -87,6 +89,12 @@ public class PlayerOverdrive : MonoBehaviour
         ApplyTint();
         _anim?.SetOverdriveMode(value);
 
+        // Heard on every peer: the authority calls this from FixedUpdateNetwork and the others from
+        // FusionPlayerCombat.Render with the replicated flag, and the equality guard above makes the body
+        // a true one-shot. Skipped for the free overdrive a domain grants — the domain has its own cue,
+        // same reason that case suppresses the screen glow below.
+        if (value && !_domainFree) _audio?.PlayOverdrive();
+
         // Glow the screen only for the local player (offline, or the online authority) — never for an
         // opponent proxy, and never for domain-granted (free) overdrive.
         if (_net == null || _net.IsLocalPlayer)
@@ -110,14 +118,23 @@ public class PlayerOverdrive : MonoBehaviour
         if (_net != null && !_net.IsAuthority) return;
         if (_health != null && _health.IsDead) { SetActive(false); return; }
 
-        if (_energy != null && _energy.CurrentEnergy > 0f)
+        // One cost per frame, paid out of cursed energy first and out of HP for whatever CE couldn't
+        // cover. Branching on "CE > 0" instead never bleeds: passive regen puts a sliver back every
+        // frame, so the meter reads fractionally above zero here and the HP drain never starts.
+        float energyCost = energyDrainPerSecond * Time.deltaTime;
+        float paidFromEnergy = 0f;
+        if (_energy != null)
         {
-            _energy.Drain(energyDrainPerSecond * Time.deltaTime);
+            paidFromEnergy = Mathf.Min(energyCost, _energy.CurrentEnergy);
+            _energy.Drain(paidFromEnergy);
         }
-        else if (_health != null)
+
+        if (paidFromEnergy < energyCost && _health != null)
         {
-            // No energy left — bleed HP. TakeDamage handles death via PlayerHealth.Die().
-            _health.TakeDamage(healthDrainPerSecond * Time.deltaTime, gameObject);
+            // Reactionless: the bleed is self-inflicted, so it drives no hurt reaction, and unlike
+            // TakeDamage it ignores invincibility — roll / aimable i-frames must not pause the cost.
+            // Still updates the bar and kills at 0 via PlayerHealth.Die().
+            _health.TakeReactionlessDamage(healthDrainPerSecond * Time.deltaTime);
         }
     }
 

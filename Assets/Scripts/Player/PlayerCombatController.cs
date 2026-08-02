@@ -96,9 +96,6 @@ public class PlayerCombatController : MonoBehaviour
 
     private void OnDamaged(float amount, GameObject source)
     {
-        // Self-inflicted damage (overdrive HP bleed) shouldn't flinch the player or fire hit feedback.
-        if (source == gameObject) return;
-
         // Cancel in-progress attacks so their coroutines don't fight the hurt-lock for movement control.
         _auto?.Cancel();
         _aimable?.Cancel();

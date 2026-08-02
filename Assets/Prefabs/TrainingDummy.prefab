@@ -283,6 +283,8 @@ GameObject:
   - component: {fileID: 235377968952828143}
   - component: {fileID: 235377968952828144}
   - component: {fileID: 1144227755331100022}
+  - component: {fileID: 189085327641805623}
+  - component: {fileID: 152980009145314291}
   m_Layer: 1
   m_Name: TrainingDummy
   m_TagString: Player1
@@ -466,6 +468,7 @@ MonoBehaviour:
   overdriveAttackDamageMultiplier: 1.8
   overdriveAttackKnockbackMultiplier: 2.5
   overdriveAttackHitboxSizeMultiplier: 1.75
+  overdriveAttackPlaybackSpeed: 1
   overdriveAttackAnim: heavy
   autoAttackHitbox: {fileID: 6101384370575966176}
 --- !u!58 &6838550130433147488
@@ -536,9 +539,14 @@ MonoBehaviour:
   _NetworkedEnergy: 0
   _NetworkedDead:
     _value: 0
+  _NetworkedRoundWins: 0
+  _NetworkedRoundResetting:
+    _value: 0
   deathLinger: 1
   fadeDuration: 0.35
-  blackoutDuration: 3
+  roundEndHold: 2
+  matchEndHold: 3.5
+  roundsToWin: 3
 --- !u!114 &6698031336873080767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -581,6 +589,7 @@ MonoBehaviour:
   hideWhenFull: 1
   flashColor: {r: 1, g: 1, b: 1, a: 1}
   flashDuration: 0.18
+  flashMinChange: 3
 --- !u!114 &1047553110942657631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -619,6 +628,17 @@ MonoBehaviour:
   moveSpeed: 5
   _NetworkedMoveDir: {x: 0, y: 0}
   _NetworkedAimDir: {x: 0, y: 0}
+  _VelocityLocked:
+    _value: 0
+  _MoveBlocked:
+    _value: 0
+  _SpeedScale: 0
+  _Leaping:
+    _value: 0
+  _LeapTarget: {x: 0, y: 0}
+  _LeapRemaining: 0
+  _Airborne:
+    _value: 0
 --- !u!114 &5781714276089560873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -632,6 +652,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _NetworkedOverdrive:
+    _value: 0
+  _NetworkedDomainActive:
+    _value: 0
+  _NetworkedDomainStartup:
+    _value: 0
+  _NetworkedAiming:
     _value: 0
 --- !u!114 &5781714276089560901
 MonoBehaviour:
@@ -687,6 +713,7 @@ MonoBehaviour:
   hideWhenFull: 1
   flashColor: {r: 1, g: 1, b: 1, a: 1}
   flashDuration: 0.18
+  flashMinChange: 3
 --- !u!114 &235377968952828143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -718,6 +745,7 @@ MonoBehaviour:
   overdriveAttackDamageMultiplier: 1.8
   overdriveAttackKnockbackMultiplier: 2.5
   overdriveAttackHitboxSizeMultiplier: 1.75
+  overdriveAttackPlaybackSpeed: 1
   aimableAttackHitbox: {fileID: 8067904713381159332}
 --- !u!114 &235377968952828144
 MonoBehaviour:
@@ -746,6 +774,147 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resetDelay: 3
+--- !u!82 &189085327641805623
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790634640250965085}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &152980009145314291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790634640250965085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc28b2207b57944f49945ddc9b33e7bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footstepSfx: []
+  footstepInterval: 0.35
+  rollSfx:
+  - {fileID: 8300000, guid: c508f4ff070f7415fb8ac234bbe6c057, type: 3}
+  autoAttackSfx:
+  - {fileID: 8300000, guid: a2ae300a4a7554b66bb0682ea9adb2b8, type: 3}
+  - {fileID: 8300000, guid: 0a77d8cd801a846d2aa194bd56c365e6, type: 3}
+  - {fileID: 8300000, guid: ca7eb8eeda3e545ab8b27dfd277d0f50, type: 3}
+  overdriveAutoAttackSfx: []
+  aimableAttackSfx:
+  - {fileID: 8300000, guid: f119a572f267b4921a0f2e0a6e87a474, type: 3}
+  - {fileID: 8300000, guid: 45a470903b91d444d9ccc665970fe0e4, type: 3}
+  - {fileID: 8300000, guid: 56d82713a83fb43d69fd064d8b1406cc, type: 3}
+  overdriveAimableAttackSfx: []
+  hitSfx:
+  - {fileID: 8300000, guid: bf02689c3cb8c40389e3293f3a01418e, type: 3}
+  - {fileID: 8300000, guid: 046797a85b0444c76bdd9382d2362c99, type: 3}
+  - {fileID: 8300000, guid: df35a16baaee84ce7a2359b7f1a7db02, type: 3}
+  - {fileID: 8300000, guid: 97d8940ba3ac4421db232edfca3e12b8, type: 3}
+  - {fileID: 8300000, guid: 83e7ae5d438ad4741a6075c681b8bc87, type: 3}
+  - {fileID: 8300000, guid: 0c85ce2ee950248f1827cbe666ed16bf, type: 3}
+  deathSfx:
+  - {fileID: 8300000, guid: 45a7a35c40f3743e9ab196a154ef3c64, type: 3}
+  - {fileID: 8300000, guid: 33a318fc9d5784461b63ffa6415ef125, type: 3}
+  - {fileID: 8300000, guid: 0b701bb6687cd4543ac1098b99cd04b5, type: 3}
+  overdriveSfx:
+  - {fileID: 8300000, guid: ee3d380a1ee3d482490be38012883fec, type: 3}
+  - {fileID: 8300000, guid: 16a66bec604474fe3b236ed8b9c6cedf, type: 3}
+  - {fileID: 8300000, guid: 1220ce093a30044c79977d7e0b53159a, type: 3}
+  domainSfx:
+  - {fileID: 8300000, guid: 91047f1860f594ff0a4ced90367e4b9c, type: 3}
+  - {fileID: 8300000, guid: 18a1331567dcb4c05ae7be81874fd37c, type: 3}
+  - {fileID: 8300000, guid: ca97d60a4467f4c40aa84bdc1250940a, type: 3}
 --- !u!1 &1801564336559946334
 GameObject:
   m_ObjectHideFlags: 0

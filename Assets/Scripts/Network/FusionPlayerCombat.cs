@@ -23,6 +23,7 @@ public class FusionPlayerCombat : NetworkBehaviour
     private BaseDomainExpansion       _domain;
     private PlayerOverdrive           _overdrive;
     private PlayerCombatController    _combat;
+    private PlayerAudio               _audio;
 
     // Server-side only (no client prediction, so no resimulation): last received input plus the previous
     // button state the press/release edges are taken against.
@@ -38,6 +39,7 @@ public class FusionPlayerCombat : NetworkBehaviour
         _domain    = GetComponent<BaseDomainExpansion>();
         _overdrive = GetComponent<PlayerOverdrive>();
         _combat    = GetComponent<PlayerCombatController>();
+        _audio     = GetComponent<PlayerAudio>();
     }
 
     public override void Spawned()
@@ -177,9 +179,16 @@ public class FusionPlayerCombat : NetworkBehaviour
             ComboCounter.Instance.Register(attacker.gameObject, _anim, wasStunned);
     }
 
+    // The SFX delay AND the fire-time overdrive flag ride along with the attack: only the server runs the
+    // attack routine, so remote peers can't know when the active window falls, and resolving overdrive from
+    // the mirrored stance instead would let the clip play at one rate while the delay was computed for the
+    // other. Sending both from the same server snapshot keeps every peer's sound on the active frames.
     private void OnLocalAutoAttackStarted(string action, Vector2 facing)
     {
-        if (HasStateAuthority) RpcAutoAttackStarted(action, facing);
+        if (!HasStateAuthority) return;
+        RpcAutoAttackStarted(action, facing,
+                             _auto != null ? _auto.ActiveDelay : 0f,
+                             _auto != null && _auto.FiredInOverdrive);
     }
 
     private void OnLocalAutoAttackEnded()
@@ -189,7 +198,10 @@ public class FusionPlayerCombat : NetworkBehaviour
 
     private void OnLocalAimableAttackStarted(Vector2 aimDir, string action)
     {
-        if (HasStateAuthority) RpcAimableAttackStarted(aimDir, action);
+        if (!HasStateAuthority) return;
+        RpcAimableAttackStarted(aimDir, action,
+                                _aimable != null ? _aimable.ImpactDelay : 0f,
+                                _aimable != null && _aimable.FiredInOverdrive);
     }
 
     private void OnLocalAimableAttackEnded()
@@ -198,11 +210,12 @@ public class FusionPlayerCombat : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
-    public void RpcAutoAttackStarted(string action, Vector2 facing)
+    public void RpcAutoAttackStarted(string action, Vector2 facing, float sfxDelay, bool overdrive)
     {
         bool directional = _auto == null || _auto.TakeDirection;
         if (directional) _anim?.SetFacing(facing);
-        _anim?.PlayAutoAttack(action, directional, _auto != null ? _auto.PlaybackSpeed : 1f);
+        _anim?.PlayAutoAttack(action, directional, _auto != null ? _auto.PlaybackSpeedFor(overdrive) : 1f);
+        _audio?.PlayAutoAttack(overdrive, sfxDelay);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
@@ -212,10 +225,11 @@ public class FusionPlayerCombat : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
-    public void RpcAimableAttackStarted(Vector2 aimDir, string action)
+    public void RpcAimableAttackStarted(Vector2 aimDir, string action, float sfxDelay, bool overdrive)
     {
         bool directional = _aimable == null || _aimable.TakeDirection;
-        _anim?.PlayAimableAttack(aimDir, action, directional, _aimable != null ? _aimable.PlaybackSpeed : 1f);
+        _anim?.PlayAimableAttack(aimDir, action, directional, _aimable != null ? _aimable.PlaybackSpeedFor(overdrive) : 1f);
+        _audio?.PlayAimableAttack(overdrive, sfxDelay);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]

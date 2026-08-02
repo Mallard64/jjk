@@ -2,9 +2,14 @@ using Fusion;
 using UnityEngine;
 
 /// <summary>
-/// Host mode movement. Only the server simulates: it consumes the controlling peer's FusionPlayerInput,
-/// drives the Rigidbody2D, and replicates move/aim direction so every peer can drive the animator in
-/// Render(). Position itself replicates through NetworkTransform.
+/// Host mode movement. The server simulates both fighters from the controlling peer's FusionPlayerInput and
+/// replicates move/aim direction so every peer can drive the animator in Render(); the controlling client
+/// predicts its own fighter from the same input. Position itself replicates through NetworkRigidbody2D.
+///
+/// Everything a predicted tick reads has to live in [Networked] state or in the input, because the client
+/// resimulates from the last confirmed tick every frame and only those two rewind. That is why the movement
+/// gate, the roll's dash and the aimable's leap are all networked here instead of being read off the
+/// controllers, which are non-networked local state that only the server runs.
 /// </summary>
 public class FusionPlayerMovement : NetworkBehaviour
 {
@@ -13,12 +18,32 @@ public class FusionPlayerMovement : NetworkBehaviour
     [Networked] public Vector2 NetworkedMoveDir { get; set; }
     [Networked] public Vector2 NetworkedAimDir  { get; set; }
 
-    // The movement gates live in the attack/roll/animation controllers, which are non-networked local state
-    // that ONLY the server runs. A predicting client can't read them, so the server publishes the resolved
-    // values here and both sides drive movement off these — same inputs, same gates, same motion.
-    [Networked] public NetworkBool VelocityLocked { get; set; }  // hitstun / roll own the velocity outright
-    [Networked] public NetworkBool MoveBlocked    { get; set; }  // …plus the aimable jump: input is ignored
-    [Networked] public float       SpeedScale     { get; set; }  // overdrive x domain x auto-attack drift
+    // "Something other than input owns the body" — knockback during hitstun, the roll's dash, and both
+    // attacks. Attacks are included so a roll cancelled into an attack keeps its momentum and decays
+    // through drag instead of being hard-zeroed (which snapped the position back). The server resolves it
+    // from the real controllers; the client predicts its onset from its own button edge (see PredictGates).
+    [Networked] public NetworkBool VelocityLocked { get; set; }
+    [Networked] public float       SpeedScale     { get; set; }  // overdrive x domain
+
+    // The roll's dash, as networked state. PlayerRoll runs it from a server-only coroutine, so without this
+    // the client keeps walking through its own roll for a round trip and is then yanked to wherever the
+    // server dashed it. DashCooldown mirrors PlayerRoll.CooldownRemaining so the client admits a roll on the
+    // same tick the server does, rather than predicting dashes the server refuses.
+    [Networked] public Vector2 DashVelocity  { get; set; }
+    [Networked] public float   DashRemaining { get; set; }
+    [Networked] public float   DashCooldown  { get; set; }
+
+    // The aimable's throwable leap. Velocity is locked for the whole attack, so without these a predicting
+    // client stands still while the server carries it a throwRadius away, and each snapshot lands as a jump.
+    [Networked] public NetworkBool Leaping       { get; set; }
+    [Networked] public Vector2     LeapTarget    { get; set; }
+    [Networked] public float       LeapRemaining { get; set; }
+    [Networked] public NetworkBool Airborne      { get; set; }  // on jumpLayer: no body collision with the opponent
+
+    // The button state the press/release edges are taken against. NETWORKED, not a plain field: a plain one
+    // does not rewind with the rest of the state, so on a resimulated tick the edges would be derived
+    // against whatever the newest tick left behind — every press either lost or fired twice.
+    [Networked] public NetworkButtons PrevButtons { get; set; }
 
     private Rigidbody2D               _rb;
     private PlayerHealth              _health;
@@ -28,11 +53,11 @@ public class FusionPlayerMovement : NetworkBehaviour
     private PlayerRoll                _roll;
     private PlayerOverdrive           _overdrive;
     private BaseDomainExpansion       _domain;
+    private FusionPlayerSync          _sync;
 
-    // Server-side only (no client prediction, so no resimulation): the last input we received, reused
-    // when a packet is missing, and the previous button state the press edges are taken against.
+    // Last input we received, reused when a packet is missing. Not networked: Fusion replays the buffered
+    // input for every resimulated tick, so this only ever fills gaps out at the prediction edge.
     private FusionPlayerInput _input;
-    private NetworkButtons    _prevButtons;
 
     void Awake()
     {
@@ -44,6 +69,7 @@ public class FusionPlayerMovement : NetworkBehaviour
         _roll      = GetComponent<PlayerRoll>();
         _overdrive = GetComponent<PlayerOverdrive>();
         _domain    = GetComponent<BaseDomainExpansion>();
+        _sync      = GetComponent<FusionPlayerSync>();
     }
 
     public override void Spawned()
@@ -76,8 +102,9 @@ public class FusionPlayerMovement : NetworkBehaviour
         // Keep consuming input even while dead/frozen so the edges stay current — otherwise a button held
         // through the freeze would fire the instant control returns.
         if (GetInput(out FusionPlayerInput received)) _input = received;
-        NetworkButtons pressed = _input.Buttons.GetPressed(_prevButtons);
-        _prevButtons = _input.Buttons;
+        NetworkButtons pressed  = _input.Buttons.GetPressed(PrevButtons);
+        NetworkButtons released = _input.Buttons.GetReleased(PrevButtons);
+        PrevButtons = _input.Buttons;
 
         if (_health != null && _health.IsDead) return;
 
@@ -89,46 +116,121 @@ public class FusionPlayerMovement : NetworkBehaviour
             return;
         }
 
-        // Server resolves the gates from the real controllers and publishes them. During hurt lock the
-        // knockback impulse drives the rigidbody, and the roll owns velocity for its dash window — so
-        // neither may have velocity overwritten. The aimable is a locked jump; the auto attack drifts
-        // at a reduced speed for repositioning.
-        if (HasStateAuthority)
+        float dt = Runner.DeltaTime;
+
+        if (HasStateAuthority) ResolveGates();
+        else                   PredictGates(pressed, released, dt);
+
+        Vector2 move = VelocityLocked ? Vector2.zero : _input.MoveDir;
+        if (!VelocityLocked && _rb != null) _rb.velocity = move * (moveSpeed * SpeedScale);
+
+        // The dash owns the body for the roll window on the server and the predicting client alike, driven
+        // off networked state so both run the identical motion from the same tick.
+        if (DashRemaining > 0f)
         {
-            bool inHitstun     = _anim != null && _anim.IsHitstun;
-            bool autoAttacking = _auto != null && _auto.IsAttacking;
-            bool aimableLocked = _aimable != null && _aimable.IsAttacking;
-            bool isRolling     = _roll != null && _roll.IsRolling;
-
-            // "Something other than input owns the body" — knockback during hitstun, the roll's dash, and
-            // the attacks. Attacks are included so a roll cancelled into an attack keeps its momentum and
-            // decays through drag instead of being hard-zeroed (which snapped the position back).
-            VelocityLocked = inHitstun || isRolling || aimableLocked || autoAttacking;
-            MoveBlocked    = VelocityLocked;
-
-            float scale = _overdrive != null ? _overdrive.MoveSpeedMultiplier : 1f;
-            if (_domain != null) scale *= _domain.MoveSpeedMultiplier;  // domain bonus (owner only)
-            SpeedScale = scale;
-
-            // The roll's dash must be re-asserted once per PHYSICS step, and physics now steps on network
-            // ticks — so it belongs here, not in PlayerRoll's Unity FixedUpdate (which is out of phase).
-            _roll?.SustainDash();
+            if (_rb != null && _rb.simulated) _rb.velocity = DashVelocity;
+            DashRemaining -= dt;
         }
 
-        Vector2 move = MoveBlocked ? Vector2.zero : _input.MoveDir;
-        if (!VelocityLocked && _rb != null) _rb.velocity = move * (moveSpeed * SpeedScale);
+        AdvanceLeap(dt);
 
         NetworkedMoveDir = move;
         NetworkedAimDir  = AimDirection();
 
-        // Roll runs a server-side coroutine over non-networked state, so it is never predicted — the
-        // client sees it through RpcRollStarted, and the dash velocity arrives with the position sync.
-        if (HasStateAuthority && pressed.IsSet(PlayerButton.Roll) && _roll != null)
+        // Roll along current move; fall back to aim direction if standing still. Both peers derive the
+        // same direction from the same replicated values, so the predicted dash matches the server's.
+        if (pressed.IsSet(PlayerButton.Roll))
+            TryStartDash(move.sqrMagnitude > 0.01f ? move : NetworkedAimDir);
+    }
+
+    /// <summary>Server: publish the gates resolved from the real controllers. During hurt lock the knockback
+    /// impulse drives the rigidbody, the roll owns velocity for its dash window, and both attacks root the
+    /// player — so none of them may have velocity overwritten by input.</summary>
+    private void ResolveGates()
+    {
+        bool inHitstun     = _anim    != null && _anim.IsHitstun;
+        bool autoAttacking = _auto    != null && _auto.IsAttacking;
+        bool aimableLocked = _aimable != null && _aimable.IsAttacking;
+        bool isRolling     = _roll    != null && _roll.IsRolling;
+
+        VelocityLocked = inHitstun || isRolling || aimableLocked || autoAttacking;
+
+        float scale = _overdrive != null ? _overdrive.MoveSpeedMultiplier : 1f;
+        if (_domain != null) scale *= _domain.MoveSpeedMultiplier;  // domain bonus (owner only)
+        SpeedScale = scale;
+
+        // Mirror rather than run a second timer: PlayerRoll owns the cooldown, this only publishes it so
+        // the client can gate its predicted dash on the same value.
+        if (_roll != null) DashCooldown = _roll.CooldownRemaining;
+    }
+
+    /// <summary>Client: predict the gates from our own input. The server resolves VelocityLocked from
+    /// controllers we don't run, so the published value is a round trip old — without this the client walks
+    /// through the first RTT of its own attack or roll and then snaps back when the locked snapshot lands.
+    /// We can't know how long the lock lasts, but we know when it STARTS: it's our own button edge, on the
+    /// same tick the server will act on it. Clearing it is left to the server's confirmed state. Locking a
+    /// touch early is invisible and unlocking a touch late costs a couple of frames of held stillness —
+    /// neither is a teleport, which is what mispredicting the onset produces.</summary>
+    private void PredictGates(NetworkButtons pressed, NetworkButtons released, float dt)
+    {
+        // Pressing Aimable only enters aim mode (movement stays free); releasing it is what fires.
+        if (pressed.IsSet(PlayerButton.AutoAttack) ||
+            pressed.IsSet(PlayerButton.Roll) ||
+            released.IsSet(PlayerButton.Aimable))
+            VelocityLocked = true;
+
+        if (DashCooldown > 0f) DashCooldown -= dt;
+    }
+
+    /// <summary>Commit the roll's dash to networked state: on the server when PlayerRoll actually rolled, on
+    /// the predicting client behind as much of the same gate as it can reproduce.
+    ///
+    /// The client deliberately does NOT call PlayerRoll.CanRoll(): that reads the roll's own cooldown timer
+    /// and CursedEnergy.CurrentEnergy, neither of which rewinds with a resimulated tick (energy is applied
+    /// in FusionPlayerSync.Render, once a frame). A resim would then answer differently than the forward
+    /// tick did and drop a dash already in flight. Every value below rewinds, so the answer is stable:
+    /// DashCooldown is the published cooldown and NetworkedEnergy is the server's own CE for that tick.</summary>
+    private void TryStartDash(Vector2 dir)
+    {
+        if (_roll == null || DashRemaining > 0f || DashCooldown > 0f) return;
+
+        if (HasStateAuthority)
         {
-            // Roll along current move; fall back to aim direction if standing still.
-            Vector2 rollDir = move.sqrMagnitude > 0.01f ? move : NetworkedAimDir;
-            _roll.TryRoll(rollDir);
+            _roll.TryRoll(dir);            // spends CE, cancels attacks, runs the i-frames and roll anim
+            if (!_roll.IsRolling) return;  // refused
         }
+        else if (_sync == null || _sync.NetworkedEnergy < _roll.EnergyCost) return;
+
+        DashVelocity  = dir.normalized * _roll.DashSpeed;
+        DashRemaining = _roll.DashDuration;
+        DashCooldown  = _roll.RollCooldown;
+    }
+
+    /// <summary>The aimable's leap is a physics write, so it advances on the network tick — never in a Unity
+    /// FixedUpdate. The server steps the controller's own leap and publishes it; a predicting client steps
+    /// the NETWORKED remaining and writes it back, so a resimulated tick continues the leap instead of
+    /// restarting it. (Seeding the controller from the networked value every tick, as this used to, re-read
+    /// the same confirmed remaining on every resimulated tick: the lerp never converged and the body was
+    /// flung at the target once per resimulated tick — the stutter and the flashes forward.)</summary>
+    private void AdvanceLeap(float dt)
+    {
+        if (_aimable == null) return;
+
+        if (HasStateAuthority)
+        {
+            _aimable.AdvanceLeap(dt);
+            Leaping       = _aimable.LeapActive;
+            LeapTarget    = _aimable.LeapTarget;
+            LeapRemaining = _aimable.LeapRemaining;
+            Airborne      = _aimable.IsAirborne;
+            return;
+        }
+
+        _aimable.SetNetworkAirborne(Airborne);
+        if (!Leaping) return;
+
+        LeapRemaining = _aimable.StepLeap(LeapTarget, LeapRemaining, dt);
+        if (LeapRemaining <= 0f) Leaping = false;
     }
 
     /// <summary>Aim resolved against the server's own position, never a client-supplied heading.</summary>

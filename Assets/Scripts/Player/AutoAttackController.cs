@@ -73,6 +73,7 @@ public class AutoAttackController : MonoBehaviour
     private CursedEnergy              _energy;
     private PlayerAnimationController _anim;
     private PlayerOverdrive           _overdrive;
+    private PlayerAudio               _audio;
 
     private float     _cooldownTimer;
     private Coroutine _routine;
@@ -85,17 +86,31 @@ public class AutoAttackController : MonoBehaviour
     private float   _currentKnockbackMultiplier = 1f;
     private float   _currentSizeMultiplier = 1f;
     private float   _currentPlaybackSpeed = 1f;
+    private bool    _currentOverdrive;
 
     public bool  IsAttacking       => _routine != null;
     public float CooldownRemaining => Mathf.Max(0f, _cooldownTimer);
+    /// <summary>Seconds from the start of the swing to the active window, resolved at fire time (so it
+    /// accounts for the clip that actually played, the overdrive variant and the playback speed). Read by
+    /// FusionPlayerCombat when it replicates the attack, so remote peers — which never run this routine —
+    /// can time the swing SFX to the same frame the hitbox comes out on.</summary>
+    public float ActiveDelay       { get; private set; }
     public bool  TakeDirection     => takeDirection;
     public bool  Throwable         => throwable;
     public float ThrowRadius       => throwRadius;
     /// <summary>Fraction of base move speed allowed while attacking; read by the movement scripts.</summary>
     public float AttackMoveSpeedMultiplier => attackMoveSpeedMultiplier;
-    /// <summary>Attack animation playback rate; read by FusionPlayerCombat so proxies match the speed. Overdrive-aware
-    /// so a proxy (which mirrors overdrive state) replays the heavy swing at its own rate.</summary>
-    public float PlaybackSpeed => (_overdrive != null && _overdrive.IsActive) ? overdriveAttackPlaybackSpeed : autoAttackPlaybackSpeed;
+    /// <summary>Whether the swing in flight was fired in overdrive — the fire-time snapshot, not the live
+    /// stance. FusionPlayerCombat sends it with the attack so a remote peer resolves the playback speed and
+    /// the SFX cue from the very value the timing was computed from.</summary>
+    public bool FiredInOverdrive => _currentOverdrive;
+
+    /// <summary>Playback rate for an attack fired in (or out of) overdrive. Takes the flag explicitly rather
+    /// than reading the live stance: on a remote peer the mirrored stance is applied in Render() and can lag
+    /// the attack RPC, which would play the clip at one rate while the SFX delay was computed for the other —
+    /// landing the swing sound off the active frames.</summary>
+    public float PlaybackSpeedFor(bool overdrive)
+        => overdrive ? overdriveAttackPlaybackSpeed : autoAttackPlaybackSpeed;
 
     // Seconds per frame = clipLength / spanFrames, so the spanning phases fill the whole attack clip.
     // FallbackSecondsPerFrame (1/60s) covers the degenerate case where no clip is readable yet (e.g. the
@@ -125,6 +140,7 @@ public class AutoAttackController : MonoBehaviour
         _energy    = GetComponent<CursedEnergy>();
         _anim      = GetComponent<PlayerAnimationController>();
         _overdrive = GetComponent<PlayerOverdrive>();
+        _audio     = GetComponent<PlayerAudio>();
     }
 
     void Update()
@@ -148,6 +164,7 @@ public class AutoAttackController : MonoBehaviour
         _currentKnockbackMultiplier = overdrive ? overdriveAttackKnockbackMultiplier : 1f;
         _currentSizeMultiplier      = overdrive ? overdriveAttackHitboxSizeMultiplier : 1f;
         _currentPlaybackSpeed       = overdrive ? overdriveAttackPlaybackSpeed        : autoAttackPlaybackSpeed;
+        _currentOverdrive           = overdrive;
 
         Vector2 toPoint = aimPoint - (Vector2)transform.position;
         _currentAimDir = toPoint.sqrMagnitude > 0.0001f
@@ -189,6 +206,9 @@ public class AutoAttackController : MonoBehaviour
         _cooldownTimer = _cooldownFrames * perFrame;
         _energy?.SuppressRegenForAction(startup + active + endlag);
 
+        // Published before the event so the network layer can hand this delay to the peers that only
+        // receive the attack as an RPC (see ActiveDelay).
+        ActiveDelay = startup;
         OnAttackStarted?.Invoke(_currentAnim, _currentAimDir);
 
         if (startup > 0f) yield return new WaitForSeconds(startup);
@@ -199,6 +219,10 @@ public class AutoAttackController : MonoBehaviour
             else if (takeDirection) autoAttackHitbox.Orient(_currentAimDir);
             autoAttackHitbox.Enable(gameObject, _currentDamageMultiplier, _currentKnockbackMultiplier, _currentSizeMultiplier);
         }
+
+        // Already at the active window, so no delay — the remote peers schedule theirs off ActiveDelay.
+        // The overdrive flag is the fire-time snapshot, so releasing Shift mid-swing can't switch the cue.
+        _audio?.PlayAutoAttack(_currentOverdrive);
 
         if (active > 0f) yield return new WaitForSeconds(active);
 

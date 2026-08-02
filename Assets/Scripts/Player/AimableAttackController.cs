@@ -72,6 +72,8 @@ public class AimableAttackController : MonoBehaviour
     private PlayerOverdrive           _overdrive;
     private PlayerHealth              _health;
     private Rigidbody2D               _rb;
+    private FusionPlayerSync          _net;
+    private PlayerAudio               _audio;
 
     private float     _cooldownTimer;
     private Coroutine _routine;
@@ -79,19 +81,45 @@ public class AimableAttackController : MonoBehaviour
     private int       _preJumpLayer;
     private bool      _onJumpLayer;
 
+    // Throwable leap state. Advanced once per PHYSICS step (see AdvanceLeap), not per coroutine yield.
+    private bool      _leaping;
+    private Vector2   _leapTarget;
+    private float     _leapRemaining;
+
     private float _currentDamageMultiplier    = 1f;
     private float _currentKnockbackMultiplier = 1f;
     private float _currentSizeMultiplier      = 1f;
     private float _currentPlaybackSpeed       = 1f;
+    private bool  _currentOverdrive;
 
     public bool  IsAiming           => _aiming;
     public bool  IsAttacking        => _routine != null;
     public float CooldownRemaining  => Mathf.Max(0f, _cooldownTimer);
     public float EnergyCost         => aimableAttackEnergyCost;
-    public float PlaybackSpeed      => (_overdrive != null && _overdrive.IsActive) ? overdriveAttackPlaybackSpeed : aimableAttackPlaybackSpeed;
+    /// <summary>Whether the attack in flight was released in overdrive — the release-time snapshot, not the
+    /// live stance. Sent with the attack RPC so a remote peer resolves the playback speed and the SFX cue
+    /// from the same value the timing was computed from (see PlaybackSpeedFor).</summary>
+    public bool  FiredInOverdrive   => _currentOverdrive;
+
+    /// <summary>Playback rate for an attack released in (or out of) overdrive. Takes the flag explicitly
+    /// rather than reading the live stance, which on a remote peer is applied in Render() and can lag the
+    /// attack RPC — playing the clip at one rate while the SFX delay was computed for the other.</summary>
+    public float PlaybackSpeedFor(bool overdrive)
+        => overdrive ? overdriveAttackPlaybackSpeed : aimableAttackPlaybackSpeed;
     public bool  TakeDirection      => takeDirection;
     public bool  Throwable          => throwable;
     public float ThrowRadius        => throwRadius;
+    /// <summary>Seconds from the start of the attack to the impact window (startup + the leap), resolved at
+    /// release time. Read by FusionPlayerCombat when it replicates the attack, so remote peers — which never
+    /// run this routine — can time the impact SFX to the same frame the hitbox lands on.</summary>
+    public float ImpactDelay        { get; private set; }
+
+    // Read by FusionPlayerMovement, which publishes them so a predicting client reproduces the leap and
+    // the jump-layer window instead of taking a correction on every server snapshot.
+    public bool    LeapActive    => _leaping;
+    public Vector2 LeapTarget    => _leapTarget;
+    public float   LeapRemaining => _leapRemaining;
+    public bool    IsAirborne    => _onJumpLayer;
 
     // Seconds per frame = clipLength / spanFrames, so the four phases fill the whole attack clip.
     // FallbackSecondsPerFrame (1/60s) covers the degenerate case where no clip is readable yet (e.g. the
@@ -123,11 +151,22 @@ public class AimableAttackController : MonoBehaviour
         _overdrive = GetComponent<PlayerOverdrive>();
         _health    = GetComponent<PlayerHealth>();
         _rb        = GetComponent<Rigidbody2D>();
+        _net       = GetComponent<FusionPlayerSync>();
+        _audio     = GetComponent<PlayerAudio>();
     }
 
     void Update()
     {
         if (_cooldownTimer > 0f) _cooldownTimer -= Time.deltaTime;
+    }
+
+    void FixedUpdate()
+    {
+        // Offline only. Online, physics steps on network ticks rather than Unity's fixed timestep, so
+        // advancing the leap here lands out of phase with the step and the jump stutters — the online
+        // layer advances it from FixedUpdateNetwork instead (same reason as PlayerRoll's dash).
+        if (_net != null && _net.Object != null && _net.Object.IsValid) return;
+        AdvanceLeap(Time.fixedDeltaTime);
     }
 
     public bool CanStartAiming()
@@ -146,6 +185,41 @@ public class AimableAttackController : MonoBehaviour
     /// Mirrors BaseDomainExpansion.SetNetworkActive — callers gate on not being the state authority.</summary>
     public void SetNetworkAiming(bool aiming) => _aiming = aiming;
 
+    /// <summary>Online mirror of the jump-layer window. Without it a predicting client keeps colliding
+    /// with the opponent while the server's body does not — and the leap targets the aim point, which is
+    /// usually the opponent, so the mismatch shows up on almost every jump.</summary>
+    public void SetNetworkAirborne(bool airborne)
+    {
+        if (airborne) EnterJumpLayer();
+        else          RestoreLayer();
+    }
+
+    /// <summary>Advance this controller's own leap by one physics step. Must be called once per physics
+    /// step: Unity's FixedUpdate offline, FixedUpdateNetwork on the simulating peer online.</summary>
+    public void AdvanceLeap(float deltaTime)
+    {
+        if (!_leaping) return;
+        _leapRemaining = StepLeap(_leapTarget, _leapRemaining, deltaTime);
+        if (_leapRemaining <= 0f) _leaping = false;
+    }
+
+    /// <summary>One physics step of a leap toward `target` with `remaining` seconds left on it; returns the
+    /// new remaining. Converges on the target from the body's CURRENT position rather than lerping from a
+    /// captured start, so a peer that learns about the leap a round trip late still lands on the point and
+    /// its error shrinks each step instead of accumulating. Split out from AdvanceLeap so a predicting
+    /// client can step the leap straight off its networked state — which rewinds with a resimulated tick,
+    /// where this controller's own fields do not.</summary>
+    public float StepLeap(Vector2 target, float remaining, float deltaTime)
+    {
+        if (_rb == null || deltaTime <= 0f) return remaining;
+
+        // MovePosition (not velocity) so rigidbody drag can't shorten the leap.
+        float span = Mathf.Max(deltaTime, remaining);
+        _rb.MovePosition(Vector2.Lerp(_rb.position, target, Mathf.Clamp01(deltaTime / span)));
+
+        return remaining - deltaTime;
+    }
+
     /// <summary>Release-to-fire. No-op if not currently aiming, on cooldown, or without enough cursed energy
     /// (CE can drain below the cost mid-aim under overdrive, so re-check here).</summary>
     public void ReleaseAttack(Vector2 aimPoint)
@@ -160,6 +234,7 @@ public class AimableAttackController : MonoBehaviour
         _currentKnockbackMultiplier = overdrive ? overdriveAttackKnockbackMultiplier  : 1f;
         _currentSizeMultiplier      = overdrive ? overdriveAttackHitboxSizeMultiplier : 1f;
         _currentPlaybackSpeed       = overdrive ? overdriveAttackPlaybackSpeed        : aimableAttackPlaybackSpeed;
+        _currentOverdrive           = overdrive;
 
         _energy?.Drain(aimableAttackEnergyCost);  // guarded above — there's enough
 
@@ -179,7 +254,9 @@ public class AimableAttackController : MonoBehaviour
         if (_routine == null) return;
         StopCoroutine(_routine);
         _routine = null;
-        // Drop the jump's i-frames and the jump layer in case the cancel landed mid-leap; otherwise both stick.
+        // Drop the jump's i-frames, the leap and the jump layer in case the cancel landed mid-leap;
+        // otherwise all three stick. No snap to the target — a cancelled leap stops where it is.
+        _leaping = false;
         _health?.SetInvincible(false);
         RestoreLayer();
         if (aimableAttackHitbox != null) aimableAttackHitbox.Disable();
@@ -222,6 +299,9 @@ public class AimableAttackController : MonoBehaviour
         _cooldownTimer = aimableAttackCooldownFrames * perFrame;
         _energy?.SuppressRegenForAction(startup + jump + impact + endlag);
 
+        // Published before the event so the network layer can hand this delay to the peers that only
+        // receive the attack as an RPC (see ImpactDelay).
+        ImpactDelay = startup + jump;
         OnAttackStarted?.Invoke(aimDir, aimableAttackAnim);
 
         if (startup > 0f) yield return new WaitForSeconds(startup);
@@ -231,9 +311,19 @@ public class AimableAttackController : MonoBehaviour
         _health?.SetInvincible(true);
         EnterJumpLayer();
         if (throwable && _rb != null && jump > 0f)
-            yield return LeapTo(target, jump);
-        else if (jump > 0f)
-            yield return new WaitForSeconds(jump);
+        {
+            _leaping       = true;
+            _leapTarget    = target;
+            _leapRemaining = jump;
+        }
+        if (jump > 0f) yield return new WaitForSeconds(jump);
+        // The phase timer runs on Unity's Update clock and the leap on the physics clock, so land the
+        // player exactly on the point if the step count came up a fraction short.
+        if (_leaping)
+        {
+            _rb.MovePosition(_leapTarget);
+            _leaping = false;
+        }
         RestoreLayer();
         _health?.SetInvincible(false);
 
@@ -245,6 +335,10 @@ public class AimableAttackController : MonoBehaviour
             aimableAttackHitbox.Enable(gameObject, _currentDamageMultiplier, _currentKnockbackMultiplier, _currentSizeMultiplier);
         }
 
+        // Already at the impact window, so no delay — the remote peers schedule theirs off ImpactDelay.
+        // The overdrive flag is the release-time snapshot, so dropping Shift mid-leap can't switch the cue.
+        _audio?.PlayAimableAttack(_currentOverdrive);
+
         if (impact > 0f) yield return new WaitForSeconds(impact);
 
         if (aimableAttackHitbox != null) aimableAttackHitbox.Disable();
@@ -255,22 +349,5 @@ public class AimableAttackController : MonoBehaviour
         _anim?.RefreshMovementState();
         _routine = null;
         OnAttackEnded?.Invoke();
-    }
-
-    // Carries the rigidbody from its current spot to `target` over `duration`, stepping in
-    // FixedUpdate. MovePosition (not velocity) so rigidbody drag can't shorten the leap and the
-    // player lands precisely on the throw point. Movement is locked, so PlayerMovement won't fight us.
-    private IEnumerator LeapTo(Vector2 target, float duration)
-    {
-        Vector2 start = _rb.position;
-        float elapsed = 0f;
-        var wait = new WaitForFixedUpdate();
-        while (elapsed < duration)
-        {
-            elapsed += Time.fixedDeltaTime;
-            _rb.MovePosition(Vector2.Lerp(start, target, Mathf.Clamp01(elapsed / duration)));
-            yield return wait;
-        }
-        _rb.MovePosition(target);
     }
 }

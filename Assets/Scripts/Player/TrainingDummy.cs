@@ -4,17 +4,25 @@ using UnityEngine;
 /// Turns a copy of the player prefab into a passive practice target. Disables all control, aiming, and
 /// networking so it never takes input, moves on its own, aims, or fights back; pins its HP/CE bars to
 /// the head (never the local-player corner UI); plays the hurt reaction when struck; never dies (a
-/// would-be killing blow tops it back up); and after a no-damage window resets to full HP at its start
-/// position. Tracks the current combo + damage and draws a detailed readout in the top-right corner.
+/// would-be killing blow tops it back up, though the KO still sounds); and after a no-damage window resets
+/// to full HP back where it was placed in the scene (or at resetPosition, if useCustomResetPosition is on),
+/// so it never drifts from wherever the last combo carried it. Repositioning goes through Teleport(), which
+/// a plain transform write cannot replace — see the note there. Tracks the current combo + damage and draws
+/// a detailed readout in the top-right corner.
 /// Offline use — place it in a non-networked scene.
 /// </summary>
 public class TrainingDummy : MonoBehaviour
 {
-    [Tooltip("Seconds without taking damage before the dummy resets to full HP at its start position.")]
+    [Tooltip("Seconds without taking damage before the dummy resets to full HP at its reset position.")]
     [SerializeField] private float resetDelay = 3f;
+    [Tooltip("Return to an explicit world point instead of wherever the dummy was placed in the scene. Leave off unless the authored spot isn't where you want it to land.")]
+    [SerializeField] private bool useCustomResetPosition = false;
+    [Tooltip("World point the dummy returns to when useCustomResetPosition is on.")]
+    [SerializeField] private Vector3 resetPosition = Vector3.zero;
 
     private PlayerHealth              _health;
     private PlayerAnimationController _anim;
+    private PlayerAudio               _audio;
     private Rigidbody2D               _rb;
 
     private Vector3 _startPosition;
@@ -31,6 +39,7 @@ public class TrainingDummy : MonoBehaviour
     {
         _health = GetComponent<PlayerHealth>();
         _anim   = GetComponent<PlayerAnimationController>();
+        _audio  = GetComponent<PlayerAudio>();
         _rb     = GetComponent<Rigidbody2D>();
         _startPosition = transform.position;
 
@@ -43,9 +52,15 @@ public class TrainingDummy : MonoBehaviour
         Disable<PlayerRoll>();
         Disable<PlayerOverdrive>();
         Disable<AimingReticle>();
-        Disable<FusionPlayerSync>();
-        Disable<FusionPlayerMovement>();
-        Disable<FusionPlayerCombat>();
+
+        // Every Fusion behaviour, not just our three: the prefab also carries Fusion's own transform sync
+        // (NetworkTransform here, NetworkRigidbody2D on the newer player prefab), which OWNS the transform
+        // whenever a runner is live and rewrites it from networked state every tick — that silently reverted
+        // the reset teleport. Disabled generically so naming the wrong type, or a future Fusion component,
+        // can't reintroduce it. Fully qualified rather than `using Fusion;` — that namespace has its own
+        // Behaviour type, which collides with UnityEngine.Behaviour in Disable<T>'s constraint below.
+        foreach (Fusion.NetworkBehaviour networked in GetComponents<Fusion.NetworkBehaviour>())
+            networked.enabled = false;
 
         // Keep the HP/CE bars on the dummy's head instead of hijacking the local-player corner UI.
         foreach (var bar in GetComponentsInChildren<WorldHealthBar>(true)) bar.ForceWorldView();
@@ -70,7 +85,12 @@ public class TrainingDummy : MonoBehaviour
     // OnDamaged) and tops the HP back up before it can reach a death.
     private void KeepAlive(float current, float max)
     {
-        if (current <= 0f && _health != null) _health.Heal(max);
+        if (current > 0f || _health == null) return;
+        // The KO still sounds even though the dummy survives it: PlayerHealth fires OnHealthChanged before
+        // its own death check, so healing here means Die() never runs and PlayerAnimationController.PlayDeath
+        // — where every other fighter's death cue lives — is never reached on the dummy.
+        _audio?.PlayDeath();
+        _health.Heal(max);
     }
 
     void Update()
@@ -117,15 +137,32 @@ public class TrainingDummy : MonoBehaviour
         _lastDamage  = 0f;
         _totalDamage = 0f;
 
-        transform.position = _startPosition;
-        if (_rb != null)
-        {
-            _rb.velocity = Vector2.zero;
-            _rb.position = _startPosition;
-        }
+        Teleport(useCustomResetPosition ? resetPosition : _startPosition);
         _health?.Respawn();  // dummy: full HP/CE, anim → idle
 
         RestorePlayers();
+    }
+
+    // Moving a dynamic Rigidbody2D takes more than assigning a position, which is why the plain
+    // transform/rb writes didn't stick:
+    //   * The body is set to Interpolate, so Unity rewrites the transform every frame by lerping from its
+    //     PREVIOUS physics pose — a teleport gets dragged back toward where it came from. Dropping
+    //     interpolation for the write clears that history; restoring it afterwards starts fresh here.
+    //   * The project has Physics2D auto-sync-transforms OFF (the default), so a transform write is
+    //     invisible to physics until a sync and the body's own pose stomps it at the next step.
+    // Velocity/spin are cleared first so leftover knockback can't carry it straight back off the spot.
+    private void Teleport(Vector3 position)
+    {
+        transform.position = position;
+        if (_rb == null) return;
+
+        RigidbodyInterpolation2D previous = _rb.interpolation;
+        _rb.interpolation   = RigidbodyInterpolation2D.None;
+        _rb.velocity        = Vector2.zero;
+        _rb.angularVelocity = 0f;
+        _rb.position        = position;
+        Physics2D.SyncTransforms();
+        _rb.interpolation   = previous;
     }
 
     // Tops every real player's HP + CE back to full — but nothing else (no reposition / respawn), so a

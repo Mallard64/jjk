@@ -283,6 +283,8 @@ GameObject:
   - component: {fileID: 235377968952828143}
   - component: {fileID: 235377968952828144}
   - component: {fileID: 1166553388770011044}
+  - component: {fileID: 8802241109814589588}
+  - component: {fileID: 3456808413444958376}
   m_Layer: 1
   m_Name: Player
   m_TagString: Player1
@@ -514,10 +516,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c5e690b5fb1084f5ab1c86457af401d4, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
   SyncScale: 0
   SyncParent: 0
+  _interpolationTarget: {fileID: 0}
+  UsePreciseRotation: 0
+  UseRenderSleepThresholds: 1
+  RenderThresholds:
+    UseEnergy: 1
+    Position: 0.01
+    Rotation: 0.01
+    Scale: 0.01
 --- !u!114 &5781714276089560871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,6 +634,18 @@ MonoBehaviour:
   moveSpeed: 5
   _NetworkedMoveDir: {x: 0, y: 0}
   _NetworkedAimDir: {x: 0, y: 0}
+  _VelocityLocked:
+    _value: 0
+  _SpeedScale: 0
+  _DashVelocity: {x: 0, y: 0}
+  _DashRemaining: 0
+  _DashCooldown: 0
+  _Leaping:
+    _value: 0
+  _LeapTarget: {x: 0, y: 0}
+  _LeapRemaining: 0
+  _Airborne:
+    _value: 0
 --- !u!114 &5781714276089560873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -672,9 +695,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cce414884ed43f4ac29fd77e48c7f96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyDrainPerSecond: 20
-  healthDrainPerSecond: 5
-  overdriveMoveSpeedMultiplier: 1.4
+  energyDrainPerSecond: 30
+  healthDrainPerSecond: 20
+  overdriveMoveSpeedMultiplier: 1.6
   spriteRenderer: {fileID: 2521658224310075947}
   overdriveTint: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &5781714276089560903
@@ -770,9 +793,150 @@ MonoBehaviour:
   slowFlickerInterval: 1.2
   fastFlickerInterval: 0.07
   flickerFlashDuration: 0.05
-  audioSource: {fileID: 0}
-  activateSfx: {fileID: 0}
   bonusMoveSpeedMultiplier: 1.3
+--- !u!82 &8802241109814589588
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790634640250965085}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &3456808413444958376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790634640250965085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc28b2207b57944f49945ddc9b33e7bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footstepSfx: []
+  footstepInterval: 0.35
+  rollSfx:
+  - {fileID: 8300000, guid: c508f4ff070f7415fb8ac234bbe6c057, type: 3}
+  autoAttackSfx:
+  - {fileID: 8300000, guid: a2ae300a4a7554b66bb0682ea9adb2b8, type: 3}
+  - {fileID: 8300000, guid: 0a77d8cd801a846d2aa194bd56c365e6, type: 3}
+  - {fileID: 8300000, guid: ca7eb8eeda3e545ab8b27dfd277d0f50, type: 3}
+  overdriveAutoAttackSfx: []
+  aimableAttackSfx:
+  - {fileID: 8300000, guid: f119a572f267b4921a0f2e0a6e87a474, type: 3}
+  - {fileID: 8300000, guid: 45a470903b91d444d9ccc665970fe0e4, type: 3}
+  - {fileID: 8300000, guid: 56d82713a83fb43d69fd064d8b1406cc, type: 3}
+  overdriveAimableAttackSfx: []
+  hitSfx:
+  - {fileID: 8300000, guid: bf02689c3cb8c40389e3293f3a01418e, type: 3}
+  - {fileID: 8300000, guid: 046797a85b0444c76bdd9382d2362c99, type: 3}
+  - {fileID: 8300000, guid: df35a16baaee84ce7a2359b7f1a7db02, type: 3}
+  - {fileID: 8300000, guid: 97d8940ba3ac4421db232edfca3e12b8, type: 3}
+  - {fileID: 8300000, guid: 83e7ae5d438ad4741a6075c681b8bc87, type: 3}
+  - {fileID: 8300000, guid: 0c85ce2ee950248f1827cbe666ed16bf, type: 3}
+  deathSfx:
+  - {fileID: 8300000, guid: 45a7a35c40f3743e9ab196a154ef3c64, type: 3}
+  - {fileID: 8300000, guid: 33a318fc9d5784461b63ffa6415ef125, type: 3}
+  - {fileID: 8300000, guid: 0b701bb6687cd4543ac1098b99cd04b5, type: 3}
+  overdriveSfx:
+  - {fileID: 8300000, guid: ee3d380a1ee3d482490be38012883fec, type: 3}
+  - {fileID: 8300000, guid: 16a66bec604474fe3b236ed8b9c6cedf, type: 3}
+  - {fileID: 8300000, guid: 1220ce093a30044c79977d7e0b53159a, type: 3}
+  domainSfx:
+  - {fileID: 8300000, guid: d3631c75de2054ea2bd7b266018911e0, type: 3}
+  - {fileID: 8300000, guid: ac9da11ecf0a145018cfd444969e8a16, type: 3}
+  - {fileID: 8300000, guid: 25f9232beee484c83bed91621c2903b9, type: 3}
+  hitVolume: 1.4
+  deathVolume: 1.6
 --- !u!1 &1801564336559946334
 GameObject:
   m_ObjectHideFlags: 0
