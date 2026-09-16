@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Universal movement skill: a brief dash with i-frames, gated by cursed energy + cooldown.
+/// Universal movement skill: a brief dash with i-frames, gated by resonance + cooldown.
 /// Triggered by the offline (PlayerCombatController) or online (FusionPlayerMovement) layer.
 /// </summary>
 public class PlayerRoll : MonoBehaviour
@@ -22,7 +22,7 @@ public class PlayerRoll : MonoBehaviour
     [SerializeField] private float rollCooldown   = 0.8f;
 
     private Rigidbody2D               _rb;
-    private CursedEnergy              _energy;
+    private Resonance                 _energy;
     private PlayerHealth              _health;
     private PlayerAnimationController _anim;
     private PlayerMovement            _movement;
@@ -50,14 +50,14 @@ public class PlayerRoll : MonoBehaviour
 
     void Awake()
     {
-        _rb        = GetComponent<Rigidbody2D>();
-        _energy    = GetComponent<CursedEnergy>();
-        _health    = GetComponent<PlayerHealth>();
-        _anim      = GetComponent<PlayerAnimationController>();
-        _movement  = GetComponent<PlayerMovement>();
-        _auto      = GetComponent<AutoAttackController>();
-        _aimable   = GetComponent<AimableAttackController>();
-        _net       = GetComponent<FusionPlayerSync>();
+        _rb       = GetComponent<Rigidbody2D>();
+        _energy   = GetComponent<Resonance>();
+        _health   = GetComponent<PlayerHealth>();
+        _anim     = GetComponent<PlayerAnimationController>();
+        _movement = GetComponent<PlayerMovement>();
+        _auto     = GetComponent<AutoAttackController>();
+        _aimable  = GetComponent<AimableAttackController>();
+        _net      = GetComponent<FusionPlayerSync>();
 
         // Attacking during a roll trades the roll's i-frames for offensive commitment.
         if (_auto    != null) _auto.OnAttackStarted    += OnAutoAttackStartedDuringRoll;

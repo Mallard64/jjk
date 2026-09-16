@@ -33,7 +33,7 @@ public class WorldHealthBar : MonoBehaviour
     [Tooltip("The fill flashes toward this colour on a discrete HP change, fading back to its normal colour.")]
     [SerializeField] private Color flashColor    = Color.white;
     [SerializeField] private float flashDuration = 0.18f;
-    [Tooltip("Minimum HP change to flash — keeps continuous drips (overdrive/domain) from flashing every frame; only real hits/spends do.")]
+    [Tooltip("Minimum HP change to flash — keeps continuous drips (overdrive/null field) from flashing every frame; only real hits/spends do.")]
     [SerializeField] private float flashMinChange = 3f;
 
     private PlayerHealth     _health;

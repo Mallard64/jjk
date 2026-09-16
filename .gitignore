@@ -54,3 +54,12 @@ mono_crash.*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Photon Fusion SDK — licensed per-developer by Exit Games and NOT redistributable.
+# Install it yourself from the Photon dashboard; see README "Running it locally".
+/Assets/Photon/
+/Assets/Photon.meta
+
+# Local engineering notes / AI working agreement — not part of the shipped project
+/CLAUDE.md
+/DEV_NOTES.md

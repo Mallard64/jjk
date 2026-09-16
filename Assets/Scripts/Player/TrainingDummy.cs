@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Turns a copy of the player prefab into a passive practice target. Disables all control, aiming, and
-/// networking so it never takes input, moves on its own, aims, or fights back; pins its HP/CE bars to
+/// networking so it never takes input, moves on its own, aims, or fights back; pins its HP/RES bars to
 /// the head (never the local-player corner UI); plays the hurt reaction when struck; never dies (a
 /// would-be killing blow tops it back up, though the KO still sounds); and after a no-damage window resets
 /// to full HP back where it was placed in the scene (or at resetPosition, if useCustomResetPosition is on),
@@ -23,7 +23,7 @@ public class TrainingDummy : MonoBehaviour
     private PlayerHealth              _health;
     private PlayerAnimationController _anim;
     private PlayerAudio               _audio;
-    private Rigidbody2D               _rb;
+    private PlayerMovement            _movement;
 
     private Vector3 _startPosition;
     private float   _idleTimer;
@@ -37,10 +37,10 @@ public class TrainingDummy : MonoBehaviour
 
     void Awake()
     {
-        _health = GetComponent<PlayerHealth>();
-        _anim   = GetComponent<PlayerAnimationController>();
-        _audio  = GetComponent<PlayerAudio>();
-        _rb     = GetComponent<Rigidbody2D>();
+        _health        = GetComponent<PlayerHealth>();
+        _anim          = GetComponent<PlayerAnimationController>();
+        _audio         = GetComponent<PlayerAudio>();
+        _movement      = GetComponent<PlayerMovement>();   // disabled below, but Teleport still works on it
         _startPosition = transform.position;
 
         // Disabled before their Start runs, so they never subscribe to input/events or tick.
@@ -62,7 +62,7 @@ public class TrainingDummy : MonoBehaviour
         foreach (Fusion.NetworkBehaviour networked in GetComponents<Fusion.NetworkBehaviour>())
             networked.enabled = false;
 
-        // Keep the HP/CE bars on the dummy's head instead of hijacking the local-player corner UI.
+        // Keep the HP/RES bars on the dummy's head instead of hijacking the local-player corner UI.
         foreach (var bar in GetComponentsInChildren<WorldHealthBar>(true)) bar.ForceWorldView();
         foreach (var bar in GetComponentsInChildren<WorldEnergyBar>(true)) bar.ForceWorldView();
     }
@@ -137,35 +137,14 @@ public class TrainingDummy : MonoBehaviour
         _lastDamage  = 0f;
         _totalDamage = 0f;
 
-        Teleport(useCustomResetPosition ? resetPosition : _startPosition);
-        _health?.Respawn();  // dummy: full HP/CE, anim → idle
+        // PlayerMovement.Teleport, not a transform write — see the note there for why that doesn't stick.
+        _movement?.Teleport(useCustomResetPosition ? resetPosition : _startPosition);
+        _health?.Respawn();  // dummy: full HP/RES, anim → idle
 
         RestorePlayers();
     }
 
-    // Moving a dynamic Rigidbody2D takes more than assigning a position, which is why the plain
-    // transform/rb writes didn't stick:
-    //   * The body is set to Interpolate, so Unity rewrites the transform every frame by lerping from its
-    //     PREVIOUS physics pose — a teleport gets dragged back toward where it came from. Dropping
-    //     interpolation for the write clears that history; restoring it afterwards starts fresh here.
-    //   * The project has Physics2D auto-sync-transforms OFF (the default), so a transform write is
-    //     invisible to physics until a sync and the body's own pose stomps it at the next step.
-    // Velocity/spin are cleared first so leftover knockback can't carry it straight back off the spot.
-    private void Teleport(Vector3 position)
-    {
-        transform.position = position;
-        if (_rb == null) return;
-
-        RigidbodyInterpolation2D previous = _rb.interpolation;
-        _rb.interpolation   = RigidbodyInterpolation2D.None;
-        _rb.velocity        = Vector2.zero;
-        _rb.angularVelocity = 0f;
-        _rb.position        = position;
-        Physics2D.SyncTransforms();
-        _rb.interpolation   = previous;
-    }
-
-    // Tops every real player's HP + CE back to full — but nothing else (no reposition / respawn), so a
+    // Tops every real player's HP + RES back to full — but nothing else (no reposition / respawn), so a
     // reset never disturbs where the player is or what they're doing. Skips dummies and online proxies.
     private void RestorePlayers()
     {
@@ -175,7 +154,7 @@ public class TrainingDummy : MonoBehaviour
             var net = health.GetComponent<FusionPlayerSync>();
             if (net != null && net.Object != null && net.Object.IsValid && !net.IsAuthority) continue; // proxy
             health.Heal(health.MaxHp);
-            var energy = health.GetComponent<CursedEnergy>();
+            var energy = health.GetComponent<Resonance>();
             if (energy != null) energy.SetEnergy(energy.MaxEnergy);
         }
     }

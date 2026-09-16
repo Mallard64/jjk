@@ -285,8 +285,9 @@ GameObject:
   - component: {fileID: 1166553388770011044}
   - component: {fileID: 8802241109814589588}
   - component: {fileID: 3456808413444958376}
+  - component: {fileID: 37499751940054199}
   m_Layer: 1
-  m_Name: Player
+  m_Name: Bot
   m_TagString: Player1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -565,7 +566,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 3578532929
+  SortKey: 3619243874
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
@@ -937,6 +938,49 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 25f9232beee484c83bed91621c2903b9, type: 3}
   hitVolume: 1.4
   deathVolume: 1.6
+--- !u!114 &37499751940054199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790634640250965085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77163b33332d14f31971cc083ce892a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  profile:
+    preset: 0
+    aggression: 1
+    accuracy: 1
+    reaction: 1
+    discipline: 0
+    defense: 0
+    adaptability: 0.731
+    recklessness: 1
+    erraticism: 0
+    useAimable: 1
+    useOverdrive: 1
+    useNullField: 1
+  autoAttackRange: 1.2
+  aimableLeadSeconds: 0.3
+  overdriveEntryCE: 60
+  fieldRetryCooldown: 6
+  fieldMinEnergyFraction: 1
+  moveSmoothing: 10
+  wallProbeDistance: 1.4
+  wallProbeRadius: 0.7
+  arenaMin: {x: -10.5, y: -5.5}
+  arenaMax: {x: 11.5, y: 5.5}
+  cornerMargin: 2.5
+  maxSeparation: 8
+  comboAfterAuto: 2
+  comboAfterAimable: 2
+  comboStepTimeout: 1
+  meterFloorRes: 20
+  rollCancelDelay: 0.1
+  showDebug: 1
 --- !u!1 &1801564336559946334
 GameObject:
   m_ObjectHideFlags: 0

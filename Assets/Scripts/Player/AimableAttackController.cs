@@ -6,7 +6,7 @@ using UnityEngine;
 /// Drives the player's aimable attack as a jump move: startup → jump (i-frames, no hitbox) →
 /// impact (hitbox active, vulnerable) → endlag → cooldown. Firing is hold-to-aim / release-to-fire:
 /// StartAiming reserves the input window; ReleaseAttack commits with the final aim direction.
-/// Cursed energy is spent at release time.
+/// Resonance is spent at release time.
 /// </summary>
 public class AimableAttackController : MonoBehaviour
 {
@@ -66,7 +66,7 @@ public class AimableAttackController : MonoBehaviour
     [Header("Hitbox")]
     [SerializeField] private AttackHitboxController aimableAttackHitbox;
 
-    private CursedEnergy              _energy;
+    private Resonance                 _energy;
     private PlayerAnimationController _anim;
     private PlayerMovement            _movement;
     private PlayerOverdrive           _overdrive;
@@ -145,7 +145,7 @@ public class AimableAttackController : MonoBehaviour
 
     void Awake()
     {
-        _energy    = GetComponent<CursedEnergy>();
+        _energy    = GetComponent<Resonance>();
         _anim      = GetComponent<PlayerAnimationController>();
         _movement  = GetComponent<PlayerMovement>();
         _overdrive = GetComponent<PlayerOverdrive>();
@@ -182,7 +182,7 @@ public class AimableAttackController : MonoBehaviour
 
     /// <summary>Online mirror for a peer that doesn't simulate this fighter: the server owns the real aim
     /// state, but the controlling client still needs IsAiming so its reticle expands while the key is held.
-    /// Mirrors BaseDomainExpansion.SetNetworkActive — callers gate on not being the state authority.</summary>
+    /// Mirrors BaseNullField.SetNetworkActive — callers gate on not being the state authority.</summary>
     public void SetNetworkAiming(bool aiming) => _aiming = aiming;
 
     /// <summary>Online mirror of the jump-layer window. Without it a predicting client keeps colliding
@@ -220,8 +220,8 @@ public class AimableAttackController : MonoBehaviour
         return remaining - deltaTime;
     }
 
-    /// <summary>Release-to-fire. No-op if not currently aiming, on cooldown, or without enough cursed energy
-    /// (CE can drain below the cost mid-aim under overdrive, so re-check here).</summary>
+    /// <summary>Release-to-fire. No-op if not currently aiming, on cooldown, or without enough resonance
+    /// (RES can drain below the cost mid-aim under overdrive, so re-check here).</summary>
     public void ReleaseAttack(Vector2 aimPoint)
     {
         if (!_aiming) return;

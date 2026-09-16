@@ -11,8 +11,8 @@ using UnityEngine;
 public class FusionPlayerCombat : NetworkBehaviour
 {
     [Networked] public NetworkBool NetworkedOverdrive     { get; set; }
-    [Networked] public NetworkBool NetworkedDomainActive  { get; set; }
-    [Networked] public NetworkBool NetworkedDomainStartup { get; set; }
+    [Networked] public NetworkBool NetworkedFieldActive  { get; set; }
+    [Networked] public NetworkBool NetworkedFieldStartup { get; set; }
     // Aim mode lives on the server, but the controlling client needs it to size its own reticle.
     [Networked] public NetworkBool NetworkedAiming        { get; set; }
 
@@ -20,7 +20,7 @@ public class FusionPlayerCombat : NetworkBehaviour
     private PlayerAnimationController _anim;
     private AutoAttackController      _auto;
     private AimableAttackController   _aimable;
-    private BaseDomainExpansion       _domain;
+    private BaseNullField             _field;
     private PlayerOverdrive           _overdrive;
     private PlayerCombatController    _combat;
     private PlayerAudio               _audio;
@@ -36,7 +36,7 @@ public class FusionPlayerCombat : NetworkBehaviour
         _anim      = GetComponent<PlayerAnimationController>();
         _auto      = GetComponent<AutoAttackController>();
         _aimable   = GetComponent<AimableAttackController>();
-        _domain    = GetComponent<BaseDomainExpansion>();
+        _field     = GetComponent<BaseNullField>();
         _overdrive = GetComponent<PlayerOverdrive>();
         _combat    = GetComponent<PlayerCombatController>();
         _audio     = GetComponent<PlayerAudio>();
@@ -82,10 +82,10 @@ public class FusionPlayerCombat : NetworkBehaviour
         NetworkButtons released = _input.Buttons.GetReleased(_prevButtons);
         _prevButtons = _input.Buttons;
 
-        // Replicate our domain's open/closed + forming state every tick so the other peer can apply
+        // Replicate our null field's open/closed + forming state every tick so the other peer can apply
         // its cross-player effects (overdrive lock / regen freeze), the startup freeze, and the VFX/arena.
-        NetworkedDomainActive  = _domain != null && _domain.IsActive;
-        NetworkedDomainStartup = _domain != null && _domain.IsStartingUp;
+        NetworkedFieldActive  = _field != null && _field.IsActive;
+        NetworkedFieldStartup = _field != null && _field.IsStartingUp;
         NetworkedAiming        = _aimable != null && _aimable.IsAiming;
 
         if (_health != null && _health.IsDead)
@@ -103,17 +103,17 @@ public class FusionPlayerCombat : NetworkBehaviour
             return;
         }
 
-        // Frozen while a domain forms (its 0.5s startup).
-        if (BaseDomainExpansion.PlayersFrozen) return;
+        // Frozen while a null field forms (its 0.5s startup).
+        if (BaseNullField.PlayersFrozen) return;
 
-        // Overdrive is a toggle: each Shift press flips the replicated state. While our domain is up the
-        // domain controls overdrive (free) — ignore presses and just mirror the real state.
-        if (_domain == null || !_domain.IsActive)
+        // Overdrive is a toggle: each Shift press flips the replicated state. While our null field is up the
+        // null field controls overdrive (free) — ignore presses and just mirror the real state.
+        if (_field == null || !_field.IsActive)
         {
             if (pressed.IsSet(PlayerButton.Overdrive)) NetworkedOverdrive = !NetworkedOverdrive;
             _overdrive?.SetActive(NetworkedOverdrive);
         }
-        // Re-sync to the real state (SetActive can refuse when domain-locked; domain-free forces it on),
+        // Re-sync to the real state (SetActive can refuse when null field-locked; null field-free forces it on),
         // so the networked flag — and the remote tint — always tracks what's really happening.
         if (_overdrive != null) NetworkedOverdrive = _overdrive.IsActive;
 
@@ -127,22 +127,22 @@ public class FusionPlayerCombat : NetworkBehaviour
         if (pressed.IsSet(PlayerButton.Aimable))    _aimable?.StartAiming();
         if (released.IsSet(PlayerButton.Aimable))   _aimable?.ReleaseAttack(aimPoint);
 
-        if (pressed.IsSet(PlayerButton.Domain) && _domain != null)
+        if (pressed.IsSet(PlayerButton.NullField) && _field != null)
         {
-            if (_domain.IsActive) _domain.Deactivate();
-            else                  _domain.Activate();
+            if (_field.IsActive) _field.Deactivate();
+            else                  _field.Activate();
         }
     }
 
     public override void Render()
     {
-        // Every peer that doesn't simulate this fighter mirrors the server's overdrive/domain state so the
-        // red tint, the domain arena and the freeze all match what the server is actually running.
+        // Every peer that doesn't simulate this fighter mirrors the server's overdrive/null field state so the
+        // red tint, the null field arena and the freeze all match what the server is actually running.
         if (!HasStateAuthority)
         {
             _overdrive?.SetActive(NetworkedOverdrive);
-            _domain?.SetNetworkActive(NetworkedDomainActive);    // mirror the domain (registry/VFX/arena)
-            _domain?.SetNetworkStartup(NetworkedDomainStartup);  // …and its forming state (freeze on this peer)
+            _field?.SetNetworkActive(NetworkedFieldActive);    // mirror the null field (registry/VFX/arena)
+            _field?.SetNetworkStartup(NetworkedFieldStartup);  // …and its forming state (freeze on this peer)
             _aimable?.SetNetworkAiming(NetworkedAiming);         // …so the controlling client's reticle expands
         }
     }

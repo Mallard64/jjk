@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// "Overdrive" stance toggled by the local player (press to turn on, press again to turn off).
-/// While active: drains cursed energy per second, then health once energy is depleted; tints the
+/// While active: drains resonance per second, then health once energy is depleted; tints the
 /// sprite red as a visual marker; and signals to AutoAttackController that the heavy auto-attack
 /// variant should fire on the next click.
 ///
@@ -13,7 +13,7 @@ public class PlayerOverdrive : MonoBehaviour
 {
     [Header("Drain")]
     [SerializeField] private float energyDrainPerSecond = 20f;
-    [Tooltip("Per-second HP drain that kicks in once cursed energy is at 0. Drain stops if the player dies.")]
+    [Tooltip("Per-second HP drain that kicks in once resonance is at 0. Drain stops if the player dies.")]
     [SerializeField] private float healthDrainPerSecond = 5f;
 
     [Header("Movement")]
@@ -30,7 +30,7 @@ public class PlayerOverdrive : MonoBehaviour
     /// <summary>1 when inactive; serialized multiplier when active. Movement scripts read this when computing velocity.</summary>
     public float MoveSpeedMultiplier => IsActive ? overdriveMoveSpeedMultiplier : 1f;
 
-    private CursedEnergy              _energy;
+    private Resonance                 _energy;
     private PlayerHealth              _health;
     private PlayerAnimationController _anim;
     private INetworkAdapter           _net;
@@ -40,7 +40,7 @@ public class PlayerOverdrive : MonoBehaviour
 
     void Awake()
     {
-        _energy = GetComponent<CursedEnergy>();
+        _energy = GetComponent<Resonance>();
         _health = GetComponent<PlayerHealth>();
         _anim   = GetComponent<PlayerAnimationController>();
         _net    = GetComponent<INetworkAdapter>();
@@ -55,26 +55,26 @@ public class PlayerOverdrive : MonoBehaviour
 
     /// <summary>Set overdrive on/off. Forced off while dead. Proxies call this every frame with the
     /// replicated state; the local player flips it via Toggle().</summary>
-    private bool _domainLocked;
+    private bool _fieldLocked;
 
-    /// <summary>Locked out of overdrive by the domain system (an enemy domain is active, or this player is
-    /// in domain burnout). Forces overdrive off and refuses re-entry while locked.</summary>
-    public void SetDomainLocked(bool locked)
+    /// <summary>Locked out of overdrive by the null field system (an enemy null field is active, or this player is
+    /// in null field burnout). Forces overdrive off and refuses re-entry while locked.</summary>
+    public void SetFieldLocked(bool locked)
     {
-        _domainLocked = locked;
+        _fieldLocked = locked;
         if (locked && IsActive) SetActive(false);
     }
 
-    private bool _domainFree;
+    private bool _fieldFree;
 
-    /// <summary>While true, the owner's active domain grants overdrive for FREE: it's forced on and
-    /// neither CE nor HP drains. Releasing it (domain ends) drops overdrive.</summary>
-    public void SetDomainFree(bool free)
+    /// <summary>While true, the owner's active null field grants overdrive for FREE: it's forced on and
+    /// neither RES nor HP drains. Releasing it (null field ends) drops overdrive.</summary>
+    public void SetFieldFree(bool free)
     {
-        if (_domainFree == free) return;
-        _domainFree = free;
-        SetActive(free);  // domain grants overdrive on open, drops it on close
-        // Domain overdrive shows the red tint but NOT the white screen glow (the domain's own collapse
+        if (_fieldFree == free) return;
+        _fieldFree = free;
+        SetActive(free);  // null field grants overdrive on open, drops it on close
+        // Null field overdrive shows the red tint but NOT the white screen glow (the null field's own collapse
         // flicker is busy enough); force the glow off in case overdrive was already on manually.
         if (free && (_net == null || _net.IsLocalPlayer))
             ScreenEffects.Instance?.SetOverdriveGlow(false);
@@ -83,7 +83,7 @@ public class PlayerOverdrive : MonoBehaviour
     public void SetActive(bool value)
     {
         if (_health != null && _health.IsDead) value = false;
-        if (_domainLocked && value) return;  // can't enter overdrive while domain-locked
+        if (_fieldLocked && value) return;  // can't enter overdrive while null field-locked
         if (IsActive == value) return;
         IsActive = value;
         ApplyTint();
@@ -91,14 +91,14 @@ public class PlayerOverdrive : MonoBehaviour
 
         // Heard on every peer: the authority calls this from FixedUpdateNetwork and the others from
         // FusionPlayerCombat.Render with the replicated flag, and the equality guard above makes the body
-        // a true one-shot. Skipped for the free overdrive a domain grants — the domain has its own cue,
+        // a true one-shot. Skipped for the free overdrive a null field grants — the null field has its own cue,
         // same reason that case suppresses the screen glow below.
-        if (value && !_domainFree) _audio?.PlayOverdrive();
+        if (value && !_fieldFree) _audio?.PlayOverdrive();
 
         // Glow the screen only for the local player (offline, or the online authority) — never for an
-        // opponent proxy, and never for domain-granted (free) overdrive.
+        // opponent proxy, and never for null field-granted (free) overdrive.
         if (_net == null || _net.IsLocalPlayer)
-            ScreenEffects.Instance?.SetOverdriveGlow(value && !_domainFree);
+            ScreenEffects.Instance?.SetOverdriveGlow(value && !_fieldFree);
     }
 
     /// <summary>Flip overdrive on/off — the toggle entry point for the local player's Shift press.</summary>
@@ -106,9 +106,9 @@ public class PlayerOverdrive : MonoBehaviour
 
     void Update()
     {
-        if (_domainFree)
+        if (_fieldFree)
         {
-            // Domain-powered: keep it on (manual toggle can't drop it) and drain nothing — it's free.
+            // Null field-powered: keep it on (manual toggle can't drop it) and drain nothing — it's free.
             if (!IsActive && !(_health != null && _health.IsDead)) SetActive(true);
             return;
         }
@@ -118,8 +118,8 @@ public class PlayerOverdrive : MonoBehaviour
         if (_net != null && !_net.IsAuthority) return;
         if (_health != null && _health.IsDead) { SetActive(false); return; }
 
-        // One cost per frame, paid out of cursed energy first and out of HP for whatever CE couldn't
-        // cover. Branching on "CE > 0" instead never bleeds: passive regen puts a sliver back every
+        // One cost per frame, paid out of resonance first and out of HP for whatever RES couldn't
+        // cover. Branching on "RES > 0" instead never bleeds: passive regen puts a sliver back every
         // frame, so the meter reads fractionally above zero here and the HP drain never starts.
         float energyCost = energyDrainPerSecond * Time.deltaTime;
         float paidFromEnergy = 0f;

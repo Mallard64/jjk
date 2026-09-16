@@ -1,9 +1,12 @@
 using UnityEngine;
 
 /// <summary>
-/// Keeps the camera on the action at a fixed zoom. Networked: follows the local-authority player.
-/// Offline: follows the midpoint of both tagged players. Orthographic size is constant — a changing
-/// zoom scaled tiles to fractional screen sizes, which produced crawling tilemap seams.
+/// Keeps the camera on the action at a fixed zoom, picking a target in priority order:
+///   1. An explicit target set by SetFollowTarget — offline practice uses this to lock onto the human.
+///   2. Networked: the local-authority player.
+///   3. Offline fallback: the midpoint of both tagged players, which is what bot-vs-bot spectating wants.
+/// Orthographic size is constant — a changing zoom scaled tiles to fractional screen sizes, which
+/// produced crawling tilemap seams.
 /// </summary>
 public class CameraFollow : MonoBehaviour
 {
@@ -28,8 +31,22 @@ public class CameraFollow : MonoBehaviour
         if (_cam != null && _cam.orthographic) _cam.orthographicSize = orthoSize;
     }
 
+    private Transform _explicitTarget;
+
+    /// <summary>Locks the camera to one fighter. Offline practice-vs-bot sets this to the human so the
+    /// view stays on them instead of drifting to the midpoint. Pass null to restore midpoint framing,
+    /// which is what bot-vs-bot spectating wants.</summary>
+    public void SetFollowTarget(Transform target) => _explicitTarget = target;
+
     void LateUpdate()
     {
+        if (_explicitTarget != null)
+        {
+            FollowTarget(_explicitTarget.position);
+            ApplyShake();
+            return;
+        }
+
         // Networked path: FusionPlayerSync registers the local-authority player in Spawned().
         var local = FusionPlayerSync.LocalPlayerTransform;
         if (local != null)

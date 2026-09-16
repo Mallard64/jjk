@@ -23,7 +23,7 @@ public class FusionPlayerMovement : NetworkBehaviour
     // through drag instead of being hard-zeroed (which snapped the position back). The server resolves it
     // from the real controllers; the client predicts its onset from its own button edge (see PredictGates).
     [Networked] public NetworkBool VelocityLocked { get; set; }
-    [Networked] public float       SpeedScale     { get; set; }  // overdrive x domain
+    [Networked] public float       SpeedScale     { get; set; }  // overdrive x null field
 
     // The roll's dash, as networked state. PlayerRoll runs it from a server-only coroutine, so without this
     // the client keeps walking through its own roll for a round trip and is then yanked to wherever the
@@ -52,7 +52,7 @@ public class FusionPlayerMovement : NetworkBehaviour
     private AimableAttackController   _aimable;
     private PlayerRoll                _roll;
     private PlayerOverdrive           _overdrive;
-    private BaseDomainExpansion       _domain;
+    private BaseNullField             _field;
     private FusionPlayerSync          _sync;
 
     // Last input we received, reused when a packet is missing. Not networked: Fusion replays the buffered
@@ -68,7 +68,7 @@ public class FusionPlayerMovement : NetworkBehaviour
         _aimable   = GetComponent<AimableAttackController>();
         _roll      = GetComponent<PlayerRoll>();
         _overdrive = GetComponent<PlayerOverdrive>();
-        _domain    = GetComponent<BaseDomainExpansion>();
+        _field     = GetComponent<BaseNullField>();
         _sync      = GetComponent<FusionPlayerSync>();
     }
 
@@ -108,8 +108,8 @@ public class FusionPlayerMovement : NetworkBehaviour
 
         if (_health != null && _health.IsDead) return;
 
-        // Frozen during the death → respawn round reset, or while a domain forms (its startup).
-        if (FusionPlayerSync.RoundResetting || BaseDomainExpansion.PlayersFrozen)
+        // Frozen during the death → respawn round reset, or while a null field forms (its startup).
+        if (FusionPlayerSync.RoundResetting || BaseNullField.PlayersFrozen)
         {
             if (_rb != null && _rb.simulated) _rb.velocity = Vector2.zero;
             if (HasStateAuthority) NetworkedMoveDir = Vector2.zero;
@@ -156,7 +156,7 @@ public class FusionPlayerMovement : NetworkBehaviour
         VelocityLocked = inHitstun || isRolling || aimableLocked || autoAttacking;
 
         float scale = _overdrive != null ? _overdrive.MoveSpeedMultiplier : 1f;
-        if (_domain != null) scale *= _domain.MoveSpeedMultiplier;  // domain bonus (owner only)
+        if (_field != null) scale *= _field.MoveSpeedMultiplier;  // null field bonus (owner only)
         SpeedScale = scale;
 
         // Mirror rather than run a second timer: PlayerRoll owns the cooldown, this only publishes it so
@@ -186,17 +186,17 @@ public class FusionPlayerMovement : NetworkBehaviour
     /// the predicting client behind as much of the same gate as it can reproduce.
     ///
     /// The client deliberately does NOT call PlayerRoll.CanRoll(): that reads the roll's own cooldown timer
-    /// and CursedEnergy.CurrentEnergy, neither of which rewinds with a resimulated tick (energy is applied
+    /// and Resonance.CurrentEnergy, neither of which rewinds with a resimulated tick (energy is applied
     /// in FusionPlayerSync.Render, once a frame). A resim would then answer differently than the forward
     /// tick did and drop a dash already in flight. Every value below rewinds, so the answer is stable:
-    /// DashCooldown is the published cooldown and NetworkedEnergy is the server's own CE for that tick.</summary>
+    /// DashCooldown is the published cooldown and NetworkedEnergy is the server's own RES for that tick.</summary>
     private void TryStartDash(Vector2 dir)
     {
         if (_roll == null || DashRemaining > 0f || DashCooldown > 0f) return;
 
         if (HasStateAuthority)
         {
-            _roll.TryRoll(dir);            // spends CE, cancels attacks, runs the i-frames and roll anim
+            _roll.TryRoll(dir);            // spends RES, cancels attacks, runs the i-frames and roll anim
             if (!_roll.IsRolling) return;  // refused
         }
         else if (_sync == null || _sync.NetworkedEnergy < _roll.EnergyCost) return;

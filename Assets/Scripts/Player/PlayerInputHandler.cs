@@ -4,7 +4,7 @@ using UnityEngine;
 /// Reads Unity input and produces a PlayerInputData struct.
 /// playerIndex 0 = WASD + mouse aim. playerIndex 1 = Arrow keys + auto-aim toward Player1.
 /// Aimable attack is hold-to-aim / release-to-fire (Q for P1, Numpad2 for P2).
-/// Domain expansion is E for P1, Numpad3 for P2.
+/// Null field expansion is E for P1, Numpad3 for P2.
 /// </summary>
 public class PlayerInputHandler : MonoBehaviour
 {
@@ -16,15 +16,37 @@ public class PlayerInputHandler : MonoBehaviour
     public bool AutoAttackDown    { get; private set; }
     public bool AimableAttackDown { get; private set; }
     public bool AimableAttackUp   { get; private set; }
-    public bool DomainDown        { get; private set; }
+    public bool NullFieldDown        { get; private set; }
     public bool RollDown          { get; private set; }
     public bool OverdriveDown     { get; private set; }
 
     // Cached for P2 auto-aim (avoids FindWithTag every frame)
     private Transform _p1Transform;
 
+    // Latched by SetExternalInput. Once a non-human source owns this player the keyboard poll stops
+    // for good — a bot writes every frame, so falling back to hardware input on a frame it happened
+    // to skip would let whoever is at the keyboard drive the bot.
+    private bool _external;
+
+    /// <summary>Feeds input from a non-human source (BotController) instead of the keyboard. The caller
+    /// owns the input from here on and must write every frame: the *Down/*Up fields are one-frame edges.</summary>
+    public void SetExternalInput(PlayerInputData data)
+    {
+        _external = true;
+        Current   = data;
+
+        AutoAttackDown    = data.AutoAttack;
+        AimableAttackDown = data.AimableAttackDown;
+        AimableAttackUp   = data.AimableAttackUp;
+        NullFieldDown        = data.NullField;
+        RollDown          = data.Roll;
+        OverdriveDown     = data.Overdrive;
+    }
+
     void Update()
     {
+        if (_external) return;
+
         if (playerIndex == 0)
             Current = ReadPlayer1();
         else
@@ -53,14 +75,14 @@ public class PlayerInputHandler : MonoBehaviour
         AutoAttackDown    = Input.GetMouseButtonDown(0);
         AimableAttackDown = Input.GetKeyDown(KeyCode.Q);
         AimableAttackUp   = Input.GetKeyUp(KeyCode.Q);
-        DomainDown        = Input.GetKeyDown(KeyCode.E);
+        NullFieldDown        = Input.GetKeyDown(KeyCode.E);
         RollDown          = Input.GetMouseButtonDown(1);
         OverdriveDown     = Input.GetKeyDown(KeyCode.LeftShift);
 
         data.AutoAttack        = AutoAttackDown;
         data.AimableAttackDown = AimableAttackDown;
         data.AimableAttackUp   = AimableAttackUp;
-        data.Domain            = DomainDown;
+        data.NullField            = NullFieldDown;
         data.Roll              = RollDown;
         data.Overdrive         = OverdriveDown;
 
@@ -98,14 +120,14 @@ public class PlayerInputHandler : MonoBehaviour
         AutoAttackDown    = Input.GetKeyDown(KeyCode.Keypad1);
         AimableAttackDown = Input.GetKeyDown(KeyCode.Keypad2);
         AimableAttackUp   = Input.GetKeyUp(KeyCode.Keypad2);
-        DomainDown        = Input.GetKeyDown(KeyCode.Keypad3);
+        NullFieldDown        = Input.GetKeyDown(KeyCode.Keypad3);
         RollDown          = Input.GetKeyDown(KeyCode.Keypad0);
         OverdriveDown     = Input.GetKeyDown(KeyCode.RightShift);
 
         data.AutoAttack        = AutoAttackDown;
         data.AimableAttackDown = AimableAttackDown;
         data.AimableAttackUp   = AimableAttackUp;
-        data.Domain            = DomainDown;
+        data.NullField            = NullFieldDown;
         data.Roll              = RollDown;
         data.Overdrive         = OverdriveDown;
 

@@ -8,7 +8,7 @@ using UnityEngine;
 /// can ship with only part of its sound set authored.
 ///
 /// Each cue is deliberately fired from the one code path that already runs on EVERY peer, so host and
-/// client both hear it with no extra replication: the animation hooks (roll / hit / death), the domain's
+/// client both hear it with no extra replication: the animation hooks (roll / hit / death), the null field's
 /// SetActiveState (owner + proxy), and a local poll for footsteps. The two attack cues are the exception —
 /// combat only simulates on the server — so the simulating peer plays them from its attack routine and the
 /// other peers are handed the same delay through FusionPlayerCombat's attack RPCs.
@@ -38,10 +38,10 @@ public class PlayerAudio : MonoBehaviour
     [SerializeField] private List<AudioClip> deathSfx = new List<AudioClip>();
 
     [Header("Stance")]
-    [Tooltip("Played when this player enters overdrive. Not played for the free overdrive a domain grants — the domain has its own cue.")]
+    [Tooltip("Played when this player enters overdrive. Not played for the free overdrive a null field grants — the null field has its own cue.")]
     [SerializeField] private List<AudioClip> overdriveSfx = new List<AudioClip>();
-    [Tooltip("Played when this player's domain opens.")]
-    [SerializeField] private List<AudioClip> domainSfx = new List<AudioClip>();
+    [Tooltip("Played when this player's null field opens.")]
+    [SerializeField] private List<AudioClip> nullFieldSfx = new List<AudioClip>();
 
     [Header("Mix")]
     [Tooltip("Volume scale for the hit cue, so a landed hit reads louder than the swing that caused it. Applied per play (PlayOneShot's own scale), so nothing has to be restored afterwards.")]
@@ -73,7 +73,7 @@ public class PlayerAudio : MonoBehaviour
         // Footsteps are polled, not event-driven: walking is a sustained state, and the same poll works on
         // every peer (offline PlayerMovement and online FusionPlayerMovement.Render both feed the animator's
         // moving flag, so a remote fighter's steps are heard too).
-        if (_anim == null || !_anim.IsWalking || BaseDomainExpansion.PlayersFrozen)
+        if (_anim == null || !_anim.IsWalking || BaseNullField.PlayersFrozen)
         {
             _footstepTimer = 0f;
             return;
@@ -113,7 +113,7 @@ public class PlayerAudio : MonoBehaviour
         _source.PlayOneShot(clip, deathVolume);
     }
 
-    public void PlayDomain()    => Play(domainSfx);
+    public void PlayNullField()    => Play(nullFieldSfx);
     public void PlayOverdrive() => Play(overdriveSfx);
 
     /// <summary>Swing sound for the auto attack. `overdrive` picks the heavy variant. `delay` is the seconds

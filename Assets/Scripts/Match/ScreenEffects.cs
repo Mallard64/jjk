@@ -11,7 +11,7 @@ public class ScreenEffects : MonoBehaviour
 {
     public static ScreenEffects Instance { get; private set; }
 
-    [Tooltip("The Hidden/JJK/ColorDamageEffect shader. Wired in the scene so it survives a build; falls back to Shader.Find if left empty.")]
+    [Tooltip("The Hidden/Resonance/ColorDamageEffect shader. Wired in the scene so it survives a build; falls back to Shader.Find if left empty.")]
     [SerializeField] private Shader effectShader;
     [SerializeField] private float flashDuration = 0.25f;
     [Tooltip("Peak tint strength at the start of a flash (0 = none, 1 = fully the flash colour).")]
@@ -41,11 +41,11 @@ public class ScreenEffects : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        var shader = effectShader != null ? effectShader : Shader.Find("Hidden/JJK/ColorDamageEffect");
+        var shader = effectShader != null ? effectShader : Shader.Find("Hidden/Resonance/ColorDamageEffect");
         if (shader != null)
             _material = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
         else
-            Debug.LogWarning("ScreenEffects: shader 'Hidden/JJK/ColorDamageEffect' not found — screen damage flashes disabled.");
+            Debug.LogWarning("ScreenEffects: shader 'Hidden/Resonance/ColorDamageEffect' not found — screen damage flashes disabled.");
     }
 
     void OnDestroy()

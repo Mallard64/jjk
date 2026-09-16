@@ -1,4 +1,4 @@
-Shader "Hidden/JJK/ColorDamageEffect"
+Shader "Hidden/Resonance/ColorDamageEffect"
 {
     Properties
     {

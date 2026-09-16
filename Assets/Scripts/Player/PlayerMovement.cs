@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
         for (int i = 0; i < n; i++)
         {
             var col = _wallProbe[i];
-            if (col == null || col.isTrigger) continue;                            // hurt/hitboxes, domains, etc.
+            if (col == null || col.isTrigger) continue;                            // hurt/hitboxes, null fields, etc.
             if (col.transform.root.GetComponent<PlayerHealth>() != null) continue; // self + the other fighter
             return true;
         }
@@ -60,14 +60,40 @@ public class PlayerMovement : MonoBehaviour
         if (_rb != null) _rb.isKinematic = false;
     }
 
-    private Rigidbody2D _rb;
-    private PlayerInputHandler _input;
+    /// <summary>Moves the fighter to a world point. Assigning transform.position is NOT enough here:
+    ///   * The project has Physics2D auto-sync-transforms OFF, so a transform write stays invisible to
+    ///     physics until a sync and the body's own pose stomps it at the next step.
+    ///   * If the body is set to Interpolate, Unity rewrites the transform every frame by lerping from
+    ///     its PREVIOUS physics pose, dragging a teleport back toward where it came from. Dropping
+    ///     interpolation for the write clears that history.
+    /// Velocity and spin are cleared first so leftover knockback can't carry it straight back off the
+    /// spot. Use this for every reposition — respawns, round resets, dummy resets.</summary>
+    public void Teleport(Vector3 position)
+    {
+        transform.position = position;
+
+        // Lazily resolved: a disabled PlayerMovement still gets Awake, but a caller can reach this
+        // before it in the same frame, and a training dummy disables the component outright.
+        if (_rb == null) _rb = GetComponent<Rigidbody2D>();
+        if (_rb == null) return;
+
+        RigidbodyInterpolation2D previous = _rb.interpolation;
+        _rb.interpolation   = RigidbodyInterpolation2D.None;
+        _rb.velocity        = Vector2.zero;
+        _rb.angularVelocity = 0f;
+        _rb.position        = position;
+        Physics2D.SyncTransforms();
+        _rb.interpolation   = previous;
+    }
+
+    private Rigidbody2D               _rb;
+    private PlayerInputHandler        _input;
     private PlayerAnimationController _anim;
-    private PlayerRoll _roll;
-    private PlayerOverdrive _overdrive;
-    private AutoAttackController _auto;
-    private BaseDomainExpansion _domain;
-    private FusionPlayerSync _net;
+    private PlayerRoll                _roll;
+    private PlayerOverdrive           _overdrive;
+    private AutoAttackController      _auto;
+    private BaseNullField             _field;
+    private FusionPlayerSync          _net;
 
     void Awake()
     {
@@ -76,9 +102,9 @@ public class PlayerMovement : MonoBehaviour
         _anim = GetComponent<PlayerAnimationController>();
         _roll = GetComponent<PlayerRoll>();
         _overdrive = GetComponent<PlayerOverdrive>();
-        _auto = GetComponent<AutoAttackController>();
-        _domain = GetComponent<BaseDomainExpansion>();
-        _net = GetComponent<FusionPlayerSync>();
+        _auto      = GetComponent<AutoAttackController>();
+        _field     = GetComponent<BaseNullField>();
+        _net       = GetComponent<FusionPlayerSync>();
     }
 
     void FixedUpdate()
@@ -88,8 +114,8 @@ public class PlayerMovement : MonoBehaviour
         // and PlayerMovement should keep driving movement here.
         if (_net != null && _net.Object != null && _net.Object.IsValid) return;
 
-        // Both fighters freeze while a domain is forming (its 0.5s startup).
-        if (BaseDomainExpansion.PlayersFrozen) { _rb.velocity = Vector2.zero; return; }
+        // Both fighters freeze while a null field is forming (its 0.5s startup).
+        if (BaseNullField.PlayersFrozen) { _rb.velocity = Vector2.zero; return; }
 
         // While locked (attack lock, hurt lock, death), don't override velocity — that
         // lets knockback impulses survive HurtLock. Linear drag on the rigidbody decays them.
@@ -100,7 +126,7 @@ public class PlayerMovement : MonoBehaviour
         var input = _input != null ? _input.Current : default;
         Vector2 move = input.MoveDir;
         float speed = moveSpeed * (_overdrive != null ? _overdrive.MoveSpeedMultiplier : 1f);
-        if (_domain != null) speed *= _domain.MoveSpeedMultiplier;  // domain bonus (owner only)
+        if (_field != null) speed *= _field.MoveSpeedMultiplier;  // null field bonus (owner only)
         // Mid auto attack the player drifts at a reduced speed for repositioning (the swing anim is
         // frozen by the animator's attack lock, so this drift won't break it).
         if (_auto != null && _auto.IsAttacking) speed *= _auto.AttackMoveSpeedMultiplier;

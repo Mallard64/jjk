@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Shows a player's cursed energy. For the local player online it's a fixed top-left screen
+/// Shows a player's resonance. For the local player online it's a fixed top-left screen
 /// UI bar; offline (both players local) it's a world-space bar above the head. For an online
-/// opponent it is hidden entirely — you never see the enemy's cursed energy. Drives
+/// opponent it is hidden entirely — you never see the enemy's resonance. Drives
 /// pre-authored prefab-child objects; see WorldHealthBar for the authoring contract and why
 /// the view is resolved every frame rather than at Awake (Fusion's Spawned() timing).
 ///
@@ -25,13 +25,13 @@ public class WorldEnergyBar : MonoBehaviour
     [SerializeField] private bool      hideWhenFull = false;
 
     [Header("Change Flash")]
-    [Tooltip("The fill flashes toward this colour on a discrete CE change, fading back to its normal colour.")]
+    [Tooltip("The fill flashes toward this colour on a discrete RES change, fading back to its normal colour.")]
     [SerializeField] private Color flashColor    = Color.white;
     [SerializeField] private float flashDuration = 0.18f;
-    [Tooltip("Minimum CE change to flash — keeps continuous drain (domain/overdrive) and regen from flashing every frame; only real spends do.")]
+    [Tooltip("Minimum RES change to flash — keeps continuous drain (null field/overdrive) and regen from flashing every frame; only real spends do.")]
     [SerializeField] private float flashMinChange = 3f;
 
-    private CursedEnergy     _energy;
+    private Resonance        _energy;
     private FusionPlayerSync _net;
     private Image            _fill;
     private View             _view = View.Unresolved;
@@ -49,10 +49,10 @@ public class WorldEnergyBar : MonoBehaviour
 
     void Awake()
     {
-        _energy = GetComponentInParent<CursedEnergy>();
+        _energy = GetComponentInParent<Resonance>();
         if (_energy == null)
         {
-            Debug.LogWarning($"WorldEnergyBar on {gameObject.name}: no CursedEnergy found in parents.");
+            Debug.LogWarning($"WorldEnergyBar on {gameObject.name}: no Resonance found in parents.");
             enabled = false;
             return;
         }
@@ -90,7 +90,7 @@ public class WorldEnergyBar : MonoBehaviour
         bool online = _net != null && _net.Object != null && _net.Object.IsValid;
         View desired;
         if (_forceWorld) desired = View.World;                              // training dummy: always head bar
-        else if (online) desired = _net.IsLocalPlayer ? View.Corner : View.Hidden; // opponent: never reveal CE
+        else if (online) desired = _net.IsLocalPlayer ? View.Corner : View.Hidden; // opponent: never reveal RES
         else             desired = View.World;                             // offline: both players local
         if (desired == _view) return;
 

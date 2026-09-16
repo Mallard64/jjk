@@ -4,11 +4,12 @@ using Fusion;
 using UnityEngine;
 
 /// <summary>
-/// Host mode identity + HP/CE replication. Owns the NetworkObject's lifecycle hooks and the remote-side
+/// Host mode identity + HP/RES replication. Owns the NetworkObject's lifecycle hooks and the remote-side
 /// HP/death mirroring; pairs with FusionPlayerMovement and FusionPlayerCombat on the same player prefab.
 ///
 /// Two different questions, two different flags:
-///   IsAuthority   — "do I simulate this player?" → state authority, i.e. the server, for BOTH fighters.
+///   IsAuthority   — "do I simulate this player?" → state authority, i.e. the server, for BOTH fighters,
+///                   and always true offline, where the local path is the only thing simulating anything.
 ///   IsLocalPlayer — "is this the fighter I control?" → input authority, exactly one per peer.
 /// On a client neither fighter is simulated locally: it sends input and renders what the server replicates.
 ///
@@ -25,7 +26,11 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
     private bool IsNetworked => Object != null && Object.IsValid;
 
     public bool IsLocalPlayer => IsNetworked && HasInputAuthority;
-    public bool IsAuthority   => IsNetworked && HasStateAuthority;
+    // With no runner driving this fighter the local path simulates it, so it IS the authority.
+    // Hitbox and PlayerOverdrive gate on this; leaving it false offline silently voided every hit and
+    // the whole overdrive drain. IsLocalPlayer deliberately does NOT get the same treatment — that
+    // would put an offline opponent's HP in the corner HUD and strobe the screen on their overdrive.
+    public bool IsAuthority   => !IsNetworked || HasStateAuthority;
 
     [Networked] public float       NetworkedHp             { get; set; }
     [Networked] public float       NetworkedEnergy         { get; set; }
@@ -48,7 +53,7 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
 
     private Rigidbody2D     _rb;
     private PlayerHealth    _health;
-    private CursedEnergy    _energy;
+    private Resonance       _energy;
     private PlayerOverdrive _overdrive;
 
     // Every live player known to this peer — both fighters on every peer; only the authority flags differ.
@@ -95,7 +100,7 @@ public class FusionPlayerSync : NetworkBehaviour, INetworkAdapter
     {
         _rb        = GetComponent<Rigidbody2D>();
         _health    = GetComponent<PlayerHealth>();
-        _energy    = GetComponent<CursedEnergy>();
+        _energy    = GetComponent<Resonance>();
         _overdrive = GetComponent<PlayerOverdrive>();
     }
 

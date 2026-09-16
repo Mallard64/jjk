@@ -85,8 +85,8 @@ public class PlayerHealth : MonoBehaviour
             mv.Unfreeze();
             mv.SetCanMove(true);
         }
-        var energy = GetComponent<CursedEnergy>();
-        if (energy != null) energy.SetEnergy(energy.MaxEnergy);  // respawn at full CE too
+        var energy = GetComponent<Resonance>();
+        if (energy != null) energy.SetEnergy(energy.MaxEnergy);  // respawn at full RES too
         OnHealthChanged?.Invoke(CurrentHp, maxHp);
     }
 }

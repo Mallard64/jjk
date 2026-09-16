@@ -70,7 +70,7 @@ public class AutoAttackController : MonoBehaviour
     [Header("Hitbox")]
     [SerializeField] private AttackHitboxController autoAttackHitbox;
 
-    private CursedEnergy              _energy;
+    private Resonance                 _energy;
     private PlayerAnimationController _anim;
     private PlayerOverdrive           _overdrive;
     private PlayerAudio               _audio;
@@ -137,7 +137,7 @@ public class AutoAttackController : MonoBehaviour
 
     void Awake()
     {
-        _energy    = GetComponent<CursedEnergy>();
+        _energy    = GetComponent<Resonance>();
         _anim      = GetComponent<PlayerAnimationController>();
         _overdrive = GetComponent<PlayerOverdrive>();
         _audio     = GetComponent<PlayerAudio>();

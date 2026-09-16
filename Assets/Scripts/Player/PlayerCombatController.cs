@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Bridges input → auto attack / aimable attack / domain expansion.
+/// Bridges input → auto attack / aimable attack / null field.
 /// Also wires health events to animation hooks (hurt, death).
 /// Aimable attack is hold-Q to aim, release-Q to fire.
 /// </summary>
@@ -13,7 +13,7 @@ public class PlayerCombatController : MonoBehaviour
     private PlayerMovement            _movement;
     private AutoAttackController      _auto;
     private AimableAttackController   _aimable;
-    private BaseDomainExpansion       _domain;
+    private BaseNullField             _field;
     private PlayerRoll                _roll;
     private PlayerOverdrive           _overdrive;
     private FusionPlayerSync          _net;
@@ -32,7 +32,7 @@ public class PlayerCombatController : MonoBehaviour
         _movement  = GetComponent<PlayerMovement>();
         _auto      = GetComponent<AutoAttackController>();
         _aimable   = GetComponent<AimableAttackController>();
-        _domain    = GetComponent<BaseDomainExpansion>();
+        _field     = GetComponent<BaseNullField>();
         _roll      = GetComponent<PlayerRoll>();
         _overdrive = GetComponent<PlayerOverdrive>();
         _net       = GetComponent<FusionPlayerSync>();
@@ -58,14 +58,17 @@ public class PlayerCombatController : MonoBehaviour
 
     void Update()
     {
-        if (_net != null) return; // online: FusionPlayerCombat drives attacks
+        // Only bail when a runner is actually driving this fighter — then FusionPlayerCombat owns
+        // attacks. A dormant sync component (offline Instantiate) must still let the local path run,
+        // which is the same test OnDamaged below and PlayerMovement/PlayerRoll already use.
+        if (_net != null && _net.Object != null && _net.Object.IsValid) return;
         if (_health != null && _health.IsDead) return;
         if (_input == null) return;
-        if (BaseDomainExpansion.PlayersFrozen) return;  // frozen while a domain forms
+        if (BaseNullField.PlayersFrozen) return;  // frozen while a null field forms
 
-        // Overdrive is a toggle: each Shift press flips it on/off. Suppressed while a domain is up — the
-        // domain controls overdrive (free) — so a stray press can't drop it.
-        if (_overdrive != null && _input.OverdriveDown && (_domain == null || !_domain.IsActive))
+        // Overdrive is a toggle: each Shift press flips it on/off. Suppressed while a null field is up — the
+        // null field controls overdrive (free) — so a stray press can't drop it.
+        if (_overdrive != null && _input.OverdriveDown && (_field == null || !_field.IsActive))
             _overdrive.Toggle();
 
         if (_anim != null && _anim.IsHitstun) return;
@@ -87,10 +90,10 @@ public class PlayerCombatController : MonoBehaviour
             if (_input.AimableAttackUp)   _aimable.ReleaseAttack(_input.Current.AimPoint);
         }
 
-        if (_input.DomainDown && _domain != null)
+        if (_input.NullFieldDown && _field != null)
         {
-            if (_domain.IsActive) _domain.Deactivate();
-            else                  _domain.Activate();
+            if (_field.IsActive) _field.Deactivate();
+            else                  _field.Activate();
         }
     }
 

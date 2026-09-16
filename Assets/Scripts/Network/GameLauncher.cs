@@ -24,9 +24,13 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private Transform  spawn1;
     [SerializeField] private Transform  spawn2;
 
+    [Header("Offline practice")]
+    [Tooltip("MatchManager that spawns the local practice line-ups. Leave empty to hide the practice buttons.")]
+    [SerializeField] private MatchManager practiceMatch;
+
     private NetworkRunner _runner;
-    private bool   _started;
-    private string _room   = "JJKArena";
+    private bool          _started;
+    private string _room   = "ResonanceArena";
     private string _status = "";
 
     // Server-side: which object belongs to which player, so a leaver's fighter is despawned.
@@ -36,12 +40,38 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (_started) return;
 
-        GUILayout.BeginArea(new Rect(Screen.width / 2f - 150, Screen.height / 2f - 80, 300, 180));
+        // Taller and higher than the original two-button menu so the practice buttons stay on screen.
+        GUILayout.BeginArea(new Rect(Screen.width / 2f - 150, Screen.height / 2f - 130, 300, 280));
         _room = GUILayout.TextField(_room, GUILayout.Height(30));
         if (GUILayout.Button("Host Match", GUILayout.Height(40))) _ = Launch(GameMode.Host);
         if (GUILayout.Button("Join Match", GUILayout.Height(40))) _ = Launch(GameMode.Client);
+
+        if (practiceMatch != null)
+        {
+            GUILayout.Space(8);
+            if (GUILayout.Button("Practice vs Bot", GUILayout.Height(34)))
+                StartLocal(MatchManager.PracticeMode.PlayerVsBot);
+            if (GUILayout.Button("Bot vs Bot", GUILayout.Height(34)))
+                StartLocal(MatchManager.PracticeMode.BotVsBot);
+        }
+
         GUILayout.Label(_status);
         GUILayout.EndArea();
+    }
+
+    /// <summary>Offline practice: no runner is created, so every gameplay script stays on its local
+    /// path. Lives here because this is the only menu in the game — a second competing OnGUI would
+    /// overlap it.</summary>
+    private void StartLocal(MatchManager.PracticeMode mode)
+    {
+        _started = true;
+
+        // The scene's passive TrainingDummy is tagged Player1, which would hijack CameraFollow's
+        // midpoint framing and PlayerInputHandler's P2 auto-aim once the real fighters spawn.
+        foreach (var dummy in FindObjectsByType<TrainingDummy>(FindObjectsSortMode.None))
+            dummy.gameObject.SetActive(false);
+
+        practiceMatch.StartMatch(mode);
     }
 
     async System.Threading.Tasks.Task Launch(GameMode mode)
@@ -113,7 +143,7 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
         data.Buttons.Set(PlayerButton.AutoAttack, Input.GetMouseButton(0));
         data.Buttons.Set(PlayerButton.Roll,       Input.GetMouseButton(1));
         data.Buttons.Set(PlayerButton.Aimable,    Input.GetKey(KeyCode.Q));
-        data.Buttons.Set(PlayerButton.Domain,     Input.GetKey(KeyCode.E));
+        data.Buttons.Set(PlayerButton.NullField,     Input.GetKey(KeyCode.E));
         data.Buttons.Set(PlayerButton.Overdrive,  Input.GetKey(KeyCode.LeftShift));
 
         input.Set(data);

@@ -7,7 +7,7 @@ public enum PlayerButton
 {
     AutoAttack = 0,
     Aimable    = 1,
-    Domain     = 2,
+    NullField  = 2,
     Roll       = 3,
     Overdrive  = 4,
 }
